@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.sun.corba.se.impl.encoding.OSFCodeSetRegistry.Entry;
+
 public class MonolingualCorpus {
 	/**
 	 * Attributs (à compléter)
@@ -72,7 +74,6 @@ public class MonolingualCorpus {
 								tab_token.put(val, pos);
 								val++;
 							}
-						
 						}	
 					}
 					pos++;
