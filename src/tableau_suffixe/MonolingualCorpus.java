@@ -37,11 +37,12 @@ public class MonolingualCorpus {
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF8"));
 			String ligne;
 			String[] tab;
-			int val = 1;
+			int val_$$ = 0;
+			int val = val_$$++;
 			int pos = 0;
 			
 			// Ajout du caractère $$ dans le dictionnaire. On lui associe la valeur 0
-			dictionnaire.put("$$", 0);
+			dictionnaire.put("$$", val_$$);
 			
 			// On lit une ligne
 			while ((ligne=br.readLine())!=null){
@@ -51,9 +52,9 @@ public class MonolingualCorpus {
 				for(String token : tab){
 					token = token.toLowerCase();
 					// Caractère de fin de paragraphe $$
-					if(token.equals("$$") && !tab_token.containsKey(0)){
+					if(token.equals("$$") && !tab_token.containsKey(val_$$)){
 						// On ajoute la position du $$
-						tab_token.put(0, pos);
+						tab_token.put(val_$$, pos);
 					}
 					
 					// Autre que caractère $$
@@ -64,9 +65,10 @@ public class MonolingualCorpus {
 						
 							// Token non présent dans le dictionnaire
 							if(!dictionnaire.containsKey(token)){
+								// Ajout du token dans le dictionnaire (avec sa valeur)
 								dictionnaire.put(token , val);
 								
-								// Ajout de la position
+								// Ajout de la position dans le tableau de token
 								tab_token.put(val, pos);
 								val++;
 							}
