@@ -9,21 +9,23 @@ import java.util.Map.Entry;
 
 public class MonolingualCorpus {
 	/**
-	 * Attributs (à compléter)
+	 * Attributs
 	 */
-	private ArrayList<String> corpus;				// contient tout le corpus
+	private ArrayList<String> corpus;				// contient tout le corpus (ensemble de lignes)
 	private int nbMotTotal;							// Le nombre de mot dans le corpus
 	private HashMap<String, Integer> dictionnaire;	// string = token, integer = valeur
 	private HashMap<Integer, Integer> tab_token;	// int = valeur, int = position
+	private String langue;
 	
 	
 	/**
-	 * Constructeur (à compléter)
+	 * Constructeur
 	 */
-	public MonolingualCorpus(String fileName){
+	public MonolingualCorpus(String fileName, String langue){
+		this.setLangue(langue);
 		dictionnaire = new HashMap<String, Integer>();
 		tab_token = new HashMap<Integer, Integer>();
-		if(!loadFromFile(fileName)){
+		if(!loadFromFile(fileName, langue)){
 			System.err.println("Erreur dans le chargement du fichier -" + fileName + "-");
 			System.exit(0);
 		}
@@ -35,54 +37,84 @@ public class MonolingualCorpus {
 	 * @param fileName
 	 * @return true si le chargement se fait correctement, false sinon
 	 */
-	public boolean loadFromFile(String fileName){
+	public boolean loadFromFile(String fileName, String langue){
 		try{
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF8"));
-			String ligne;
+			String ligne, token, reelleLigne;
 			String[] tab;
-			int val_$$ = 0;
-			int val = val_$$++;
-			int pos = 0;
+			int val_$$ = 0;			// valeur numérique du caractère de fin
+			int val = val_$$++;		// valeur numérique des autres caractères
+			int pos = 0;			// position du token dans le corpus
+			int i;
 			
 			// Ajout du caractère $$ dans le dictionnaire. On lui associe la valeur 0
 			dictionnaire.put("$$", val_$$);
 			
 			// On lit une ligne
 			while ((ligne=br.readLine())!=null){
-				// Ajout de la ligne
-				corpus.add(ligne);
+				// On parse la ligne en enlevant les espaces
+				tab = ligne.split(" ");
 				
-				tab = ligne.split(" ");		// On parse la ligne
-				
-				// On lit le tableau parsé
-				for(String token : tab){
-					token = token.toLowerCase();
-					// Caractère de fin de paragraphe $$
-					if(token.equals("$$") && !tab_token.containsKey(val_$$)){
-						// On ajoute la position du $$
-						tab_token.put(val_$$, pos);
+				// On prend en compte que les lignes de la langue
+				if(tab[1].equals(langue)){
+					
+					// On souhaite ajouter la "vraie" ligne a l'attribut corpus 
+					// (sans le int et la langue)
+					reelleLigne = reelleLigne(ligne, tab);
+					
+					// Si c'est null --> erreur
+					if(reelleLigne == null){
+						System.err.println("reelleLigne est null");
+						System.exit(0);
 					}
 					
-					// Autre que caractère $$
-					else{
-						char firstLettre = token.charAt(0);
-						/** A MODIFIER : ce if dit qu'on accepte que les tokens qui commence par
-						 * un chiffre ou une lettre ==> Necessaire?
-						 */
-						if((firstLettre>='a' && firstLettre<='z') || (firstLettre>='0' && firstLettre<='9')){
+					// On remplit la variable corpus
+					corpus.add(reelleLigne);
+					
+					// On lit le tableau parsé
+					
+					/**
+					 *Remarque : on commence a i=2 car a 
+					 * - i=0 : c'est un integer (on en fait rien??)
+					 * - i=1 : c'est la langue
+					 */
+					for(i=2; i<tab.length; i++){
 						
-							// Token non présent dans le dictionnaire
-							if(!dictionnaire.containsKey(token)){
-								// Ajout du token dans le dictionnaire (avec sa valeur)
-								dictionnaire.put(token , val);
-								
-								// Ajout de la position dans le tableau de token
-								tab_token.put(val, pos);
-								val++;
-							}
-						}	
+						// On transforme la chaine en minuscule
+						token = tab[i].toLowerCase();
+						
+						// Si on tombe sur le caractère de fin de paragraphe $$
+						if(token.equals("$$") && !tab_token.containsKey(val_$$)){
+							// On ajoute la position du $$
+							tab_token.put(val_$$, pos);
+						}
+						
+						// Autre que caractère $$
+						else{
+							char firstLettre = token.charAt(0);
+							/** A MODIFIER : ce if dit qu'on accepte que les tokens qui commence par
+							 * un chiffre ou une lettre ==> Necessaire?
+							 */
+							// Le token doit commencer par une lettre ou un chiffre
+							if((firstLettre>='a' && firstLettre<='z') || (firstLettre>='0' && firstLettre<='9')){
+							
+								// On enleve un caractère de ponctuation ou autre s'il y
+								// en a un a la fin du token
+								token = enlevePonctuationEnFinDeToken(token);
+															
+								// Token non présent dans le dictionnaire
+								if(!dictionnaire.containsKey(token)){
+									// Ajout du token dans le dictionnaire (avec sa valeur)
+									dictionnaire.put(token , val);
+									
+									// Ajout de la position dans le tableau de token
+									tab_token.put(val, pos);
+									val++;
+								}
+							}	
+						}
+						pos++;
 					}
-					pos++;
 				}
 			}
 			setNbMotTotal(pos+1);
@@ -93,7 +125,12 @@ public class MonolingualCorpus {
 			return false;
 		}
 	}
-	
+
+	/**
+	 * 
+	 * @param position
+	 * @return le token present dans le corpus a la position passee en parametre
+	 */
 	public String getTokenAtPosition(int position){
 		// Parcours de tab_token (valeur, position)
 		for(Entry<Integer, Integer> entry : tab_token.entrySet()) {
@@ -117,6 +154,12 @@ public class MonolingualCorpus {
 		return null;
 	}
 	
+	/**
+	 * Un suffixe est le token present a la position passee en parametre, et se termine 
+	 * jusqu'a la fin du paragraphe (visible grace au caractere $$)
+	 * @param position
+	 * @return le suffixe present a la position passee en parametre dans le corpus
+	 */
 	public String getSuffixFromPosition(int position){
 		String suffixe = "";
 		int i, j;
@@ -156,9 +199,78 @@ public class MonolingualCorpus {
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param position1
+	 * @param position2
+	 * @return
+	 */
 	public int compareSuffixes(int position1, int position2){
 		return 0;
 	}
+	
+	
+	
+	/**
+	 * Methodes auxiliaires
+	 */
+	
+	/**
+	 * 
+	 * @param ligne
+	 * @param tab
+	 * @return un string, la "vraie" ligne, sans l'integer et la langue au début de la ligne
+	 */
+	private String reelleLigne(String ligne, String[] tab) {
+		int i=0;
+		String lang = tab[1];
+		int size = ligne.length();
+		
+		// On avance jusqu'a trouver la premiere lettre de la langue
+		while(i<size && ligne.charAt(i) != lang.charAt(0)){
+			i++;
+		}
+		
+		// Ici, i est a la premiere lettre de la langue normalement
+		int size_lang = lang.length();
+		int j = 0;
+		
+		// On verifie bien qu'on est bien au mot de la langue
+		while(i<size && j<size_lang && ligne.charAt(i) == lang.charAt(j)){
+			i++;
+			j++;
+		}
+		// Si c'est vrai, alors c'était bien la langue
+		if(j == size_lang){
+			// On enleve les espaces
+			while(i<size && ligne.charAt(i) == ' '){
+				i++;
+			}
+			// Arrive ici, c'est le debut de la "vraie" ligne
+			return ligne.substring(i, size-1);
+		}
+		// Si on arrive ici, c'est qu'il y a eu une erreur
+		return null;
+	}
+
+	/**
+	 * Permet d'enlever des caractères de ponctuation eventuellement present 
+	 * a la fin du token
+	 * @param token
+	 * @return string (token) sans la ponctuation a la fin du token "initial"
+	 */
+	private String enlevePonctuationEnFinDeToken(String token) {
+		char end = token.charAt(token.length()-1);
+		if(!((end>='a' && end<='z')||(end>='0' && end<='9'))){
+			return enlevePonctuationEnFinDeToken(token.substring(0, token.length()-2));
+		}
+		return token;
+	}
+	
+	
+	/**
+	 * Get & Set
+	 */
 
 	public HashMap<String, Integer> getDictionnaire() {
 		return dictionnaire;
@@ -182,6 +294,14 @@ public class MonolingualCorpus {
 
 	public void setNbMotTotal(int nbMotTotal) {
 		this.nbMotTotal = nbMotTotal;
+	}
+
+	public String getLangue() {
+		return langue;
+	}
+
+	public void setLangue(String langue) {
+		this.langue = langue;
 	}
 	
 }
