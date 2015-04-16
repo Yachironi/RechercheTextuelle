@@ -2,20 +2,20 @@ package tableau_suffixe;
 
 public class MonolingualCorpus {
 	/**
-	 * Attributs (à compléter)
+	 * Attributs (Ã  complï¿½ter)
 	 */
 	
 	
 	
 	/**
-	 * Constructeur (à compléter)
+	 * Constructeur (ï¿½ complï¿½ter)
 	 */
 	public MonolingualCorpus(){
 		
 	}
 
 	/** Permet de charger le corpus, le segmenter en tokens 
-	 *  et créer les structures de données associées
+	 *  et crï¿½er les structures de donnï¿½es associï¿½es
 	 * @param fileName
 	 * @return true si le chargement se fait correctement, false sinon
 	 */
