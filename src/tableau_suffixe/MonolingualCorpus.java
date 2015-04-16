@@ -304,4 +304,52 @@ public class MonolingualCorpus {
 		this.langue = langue;
 	}
 	
+	
+	/**
+	 * Main pour tester cette classe AVEC LES DONNEES DE TATOEBA UNIQUEMENT
+	 */
+	public static void main(String[] args){
+		String fileName = "";	// A CHANGER AVANT DE TESTER
+		MonolingualCorpus test = new MonolingualCorpus(fileName, "fra");
+		
+		// Si on arrive jusqu'ici, c'est que le load n'a pas générer d'erreur
+		
+		/**
+		 * Test de getTokenAtPosition
+		 */
+		int position = 4;	// A CHANGER EN FONCTION DU FICHIER
+		System.out.println("Test de getTokenAtPosition a la position " + position);
+		System.out.println("---> " + test.getTokenAtPosition(position));
+		
+		/**
+		 * Test de getSuffixFromPosition
+		 */
+		position = 4;	// A CHANGER EN FONCTION DU FICHIER
+		System.out.println("Test de getSuffixFromPosition a la position " + position);
+		System.out.println("---> " + test.getSuffixFromPosition(position));
+		
+		/**
+		 * Test de compareSuffixes
+		 */
+		
+		
+		/**
+		 * Affichage du dictionnaire
+		 */
+		System.out.println("---------Dictionnaire------------");
+		for(Entry<String, Integer> entry : test.getDictionnaire().entrySet()) {
+		    System.out.println("(" + entry.getKey() + ", " + entry.getValue() + ")");
+		}
+		System.out.println("---------------------------------");
+		
+		
+		/**
+		 * Affichage de tab_token
+		 */
+		System.out.println("-----------Tab_token------------");
+		for(Entry<Integer, Integer> entry2 : test.getTab_token().entrySet()) {
+		    System.out.println("(" + entry2.getKey() + ", " + entry2.getValue() + ")");
+		}
+		System.out.println("--------------------------------");
+	}
 }
