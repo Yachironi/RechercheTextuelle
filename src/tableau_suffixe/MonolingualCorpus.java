@@ -2,10 +2,16 @@ package tableau_suffixe;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+
+import opennlp.tools.tokenize.Tokenizer;
+import opennlp.tools.tokenize.TokenizerME;
+import opennlp.tools.tokenize.TokenizerModel;
 
 public class MonolingualCorpus {
 	/**
@@ -21,11 +27,12 @@ public class MonolingualCorpus {
 	private HashMap<Integer, ArrayList<Integer>> tab_token;
 	
 	// Langue du corpus
-	private String langue;
-	
+	private String langue;	
 	private static int val_$$ = 0;			// valeur numerique du caractere de fin
+	private  InputStream is;
+	private  TokenizerModel model;
+	private  Tokenizer tokenizer;	
 
-	
 	
 	/**
 	 * Constructeur
@@ -50,12 +57,24 @@ public class MonolingualCorpus {
 			int pos = 0;			// position du token dans le corpus
 			int i, id_ligne, val_token;
 			
+			// Mise en place de la tokenisation
+			is = new FileInputStream("fr-token.bin");
+			model = null;
+			try {
+				model = new TokenizerModel(is);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			tokenizer = new TokenizerME(model);
+			
 			// Ajout du caractere $$ dans le dictionnaire. On lui associe la valeur 0
 			dictionnaire.put("$$", val_$$);
+			
 			// On parcours l'ensemble du corpus
 			while ((ligne=br.readLine())!=null){
 				// On parse la ligne en enlevant les espaces
-				tab = ligne.split(" ");
+				tab = tokenize(ligne);
 				// On prend que les donnees de la langue choisie
 				if(tab[1].equals(langue)){
 					id_ligne = Integer.parseInt(tab[0]);
@@ -98,6 +117,7 @@ public class MonolingualCorpus {
 					}
 				}
 			}
+			is.close();
 			return true;
 		}
 		catch(Exception e){
@@ -354,5 +374,9 @@ public class MonolingualCorpus {
 
 	public void setCorpus(ArrayList<Integer> corpus) {
 		this.corpus = corpus;
+	}
+	
+	public String[] tokenize(String chaine){
+		return tokenizer.tokenize(chaine);
 	}
 }
