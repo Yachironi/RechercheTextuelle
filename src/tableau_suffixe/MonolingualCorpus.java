@@ -11,11 +11,20 @@ public class MonolingualCorpus {
 	/**
 	 * Attributs
 	 */
-	private ArrayList<Integer> corpus;				// contient tout le corpus (ensemble de lignes)
-	private int nbMotTotal;							// Le nombre de mot dans le corpus
-	private HashMap<String, Integer> dictionnaire;	// string = token, integer = valeur
-	private HashMap<Integer, ArrayList<Integer>> tab_token;	// int = valeur, int = position
+	// contient tout le corpus (represente par leur valeur). L'indice = position du mot
+	private ArrayList<Integer> corpus;
+	
+	// string = token, integer = valeur du token
+	private HashMap<String, Integer> dictionnaire;
+	
+	// int = valeur, liste de int = identifiant de la phrase ou est present le token
+	private HashMap<Integer, ArrayList<Integer>> tab_token;
+	
+	// Langue du corpus
 	private String langue;
+	
+	private static int val_$$ = 0;			// valeur numerique du caractere de fin
+
 	
 	
 	/**
@@ -31,98 +40,70 @@ public class MonolingualCorpus {
 		}
 		
 	}
-
-	/** Permet de charger le corpus, le segmenter en tokens 
-	 *  et cr�er les structures de donn�es associ�es
-	 * @param fileName
-	 * @return true si le chargement se fait correctement, false sinon
-	 */
+	
 	public boolean loadFromFile(String fileName, String langue){
-		return true;
-		/*
 		try{
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF8"));
 			String ligne, token, reelleLigne;
 			String[] tab;
-			int val_$$ = 0;			// valeur num�rique du caract�re de fin
-			int val = val_$$++;		// valeur num�rique des autres caract�res
+			int val = val_$$++;		// valeur numerique des autres caracteres
 			int pos = 0;			// position du token dans le corpus
-			int i;
+			int i, id_ligne, val_token;
 			
-			// Ajout du caract�re $$ dans le dictionnaire. On lui associe la valeur 0
+			// Ajout du caractere $$ dans le dictionnaire. On lui associe la valeur 0
 			dictionnaire.put("$$", val_$$);
-			
-			// On lit une ligne
+			// On parcours l'ensemble du corpus
 			while ((ligne=br.readLine())!=null){
 				// On parse la ligne en enlevant les espaces
 				tab = ligne.split(" ");
-				System.out.println(ligne);
-				System.out.println("size "+tab.length);
-				// On prend en compte que les lignes de la langue
+				// On prend que les donnees de la langue choisie
 				if(tab[1].equals(langue)){
-					
-					// On souhaite ajouter la "vraie" ligne a l'attribut corpus 
-					// (sans le int et la langue)
-					reelleLigne = reelleLigne(ligne, tab);
-					
-					// Si c'est null --> erreur
-					if(reelleLigne == null){
-						System.err.println("reelleLigne est null");
-						System.exit(0);
-					}
-					
-					// On remplit la variable corpus
-					corpus.add(reelleLigne);
-					
-					// On lit le tableau pars�			
-			
+					id_ligne = Integer.parseInt(tab[0]);
+
+					// On lit le tableau parse (on commence a i=2 car on prend pas le int
+					// et la langue
 					for(i=2; i<tab.length; i++){
 						
 						// On transforme la chaine en minuscule
 						token = tab[i].toLowerCase();
-
-						// Si on tombe sur le caract�re de fin de paragraphe $$
-						if(token.equals("$$") && !tab_token.containsKey(val_$$)){
-							// On ajoute la position du $$
-							tab_token.put(val_$$, pos);
+						
+						// On ajoute le token au dictionnaire s'il n'y ait pas
+						if(!dictionnaire.containsKey(token)){
+							dictionnaire.put(token , val);
+							val++;
 						}
 						
-						// Autre que caract�re $$
-						else{
-							char firstLettre = token.charAt(0);
-							** A MODIFIER : ce if dit qu'on accepte que les tokens qui commence par
-							 * un chiffre ou une lettre ==> Necessaire?
-							 
-							// Le token doit commencer par une lettre ou un chiffre
-							if((firstLettre>='a' && firstLettre<='z') || (firstLettre>='0' && firstLettre<='9')){
-							
-								// On enleve un caract�re de ponctuation ou autre s'il y
-								// en a un a la fin du token
-								token = enlevePonctuationEnFinDeToken(token);
-															
-								// Token non pr�sent dans le dictionnaire
-								if(!dictionnaire.containsKey(token)){
-									// Ajout du token dans le dictionnaire (avec sa valeur)
-									dictionnaire.put(token , val);
-									
-									// Ajout de la position dans le tableau de token
-									tab_token.put(val, pos);
-									val++;
-								}
-							}	
+						// On ajoute l'identifiant de la ligne
+						// Cas ou tab_token contient la valeur du token
+						val_token = dictionnaire.get(token);
+						if(tab_token.containsKey(val_token)){
+							tab_token.get(val_token).add(id_ligne);
 						}
-						pos++;
+						// Cas ou tab_token ne contient pas la valeur du token
+						else{
+							tab_token.put(val_token, new ArrayList<Integer>(id_ligne));
+						}
+						
+						// Ajout du token (via sa valeur) dans le corpus
+						corpus.add(val_token);
+					}
+					
+					// On ajoute le caractere de fin de ligne $$
+					corpus.add(val_$$);
+					if(tab_token.containsKey(val_$$)){
+						tab_token.get(val_$$).add(id_ligne);
+					}
+					else{
+						tab_token.put(val_$$, new ArrayList<Integer>(id_ligne));
 					}
 				}
 			}
-			setNbMotTotal(pos+1);
 			return true;
 		}
 		catch(Exception e){
 			System.out.println(e.toString());
 			return false;
 		}
-		*/
 	}
 
 	/**
@@ -131,29 +112,26 @@ public class MonolingualCorpus {
 	 * @return le token present dans le corpus a la position passee en parametre
 	 */
 	public String getTokenAtPosition(int position){
-		return null;
-		/*
-		// Parcours de tab_token (valeur, position)
-		for(Entry<Integer, Integer> entry : tab_token.entrySet()) {
-		    Integer cle_tab_token = entry.getKey();
-		    Integer valeur_tab_token = entry.getValue();
-		    
-		    // Cas ou on a trouv� la bonne position
-		    if(valeur_tab_token == position){
-		    	// Parcours du dictionnaire (token, valeur)
-				for(Entry<String, Integer> entry2 : dictionnaire.entrySet()) {
-				    String token = entry2.getKey();
-				    Integer valeur_token = entry2.getValue();
-				    
-				    // Cas ou on a trouv� le token
-				    if(valeur_tab_token == valeur_token){
-				    	return token;
-				    }
-				}
-		    }
+		// Message d'erreur si position est incorrecte
+		if(position>=corpus.size()){
+			System.err.println("La position n'est pas dans le corpus");
+			System.exit(0);
 		}
+		
+		// On recupere la valeur du token
+		int val_token = corpus.get(position);
+		
+		// On cherche le token dans le dictionnaire
+		for(Entry<String, Integer> entry : dictionnaire.entrySet()){
+			if(entry.getValue() == val_token){
+				return entry.getKey();
+			}
+		}
+		
+		// Si on arrive ici : probleme
+		System.err.println("La valeur du token -" + val_token + "- a la position -"
+				+ position + "- n'est pas dans le dictionnaire");
 		return null;
-		*/
 	}
 	
 	/**
@@ -163,47 +141,50 @@ public class MonolingualCorpus {
 	 * @return le suffixe present a la position passee en parametre dans le corpus
 	 */
 	public String getSuffixFromPosition(int position){
-		return null;
-		/*
+		int pos_debut_phrase = getDebutPhrase(position);
+		int pos_fin_phrase = getFinPhrase(position);
 		String suffixe = "";
-		int i, j;
-		int nbMots = 0;
-		for(i=0; i<corpus.size(); i++){
-			nbMots += corpus.get(i).split(" ").length;
-			// Le mot est dans cette ligne
-			if(position<=nbMots){
-				String[] tab = corpus.get(i).split(" ");
-				int pos = nbMots-position;
-				
-				// On parcourt la ligne
-				for(j=pos; j<tab.length; j++){
-					// Si on tombe sur la fin du paragraphe, on renvoie le suffixe
-					if(tab[j].equals("$$")){
-						return suffixe.substring(0, suffixe.length()-2);
-					}
-					suffixe = suffixe + tab[j] + " ";
-				}
-				// Si on sort de cette boucle, la ligne est fini mais pas le paragraphe :
-				//    il faut continuer aux lignes suivantes jusqu'a trouver $$
-				for(i=i+1; i<corpus.size(); i++){
-					tab = corpus.get(i).split(" ");
-					for(j=0; j<tab.length; j++){
-						// Si on tombe sur la fin du paragraphe, on renvoie le suffixe
-						if(tab[j].equals("$$")){
-							return suffixe.substring(0, suffixe.length()-2);
-						}
-						suffixe += tab[j];
-					}
-				}
-			}
+		for(int i=pos_debut_phrase; i<pos_fin_phrase; i++){
+			suffixe = suffixe + getTokenAtPosition(corpus.get(i)) + " ";
 		}
-		if(!suffixe.equals("")){
-			return suffixe.substring(0, suffixe.length()-2);
-		}
-		return null;
-		*/
+		return suffixe.substring(0, suffixe.length()-2);
 	}
-	
+
+	private int getFinPhrase(int position) {
+		// Message d'erreur si position est incorrecte
+		if(position>=corpus.size()){
+			System.err.println("La position n'est pas dans le corpus");
+			return -1;
+		}
+		
+		int i=position;
+		int size = corpus.size();
+		while(i<size && corpus.get(i) != val_$$){
+			i++;
+		}
+		if(i==size){
+			return i;
+		}
+		return i+1;
+	}
+
+	private int getDebutPhrase(int position) {
+		// Message d'erreur si position est incorrecte
+		if(position>=corpus.size()){
+			System.err.println("La position n'est pas dans le corpus");
+			return -1;
+		}
+		
+		int i=position;
+		while(i>0 && corpus.get(i) != val_$$){
+			i--;
+		}
+		if(i==0){
+			return i;
+		}
+		return i+1;
+	}
+
 	/**
 	 * 
 	 * @param position1
@@ -307,14 +288,6 @@ public class MonolingualCorpus {
 
 	public void setTab_token(HashMap<Integer, ArrayList<Integer>> tab_token) {
 		this.tab_token = tab_token;
-	}
-
-	public int getNbMotTotal() {
-		return nbMotTotal;
-	}
-
-	public void setNbMotTotal(int nbMotTotal) {
-		this.nbMotTotal = nbMotTotal;
 	}
 
 	public String getLangue() {
