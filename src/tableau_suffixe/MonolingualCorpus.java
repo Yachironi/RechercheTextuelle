@@ -20,7 +20,7 @@ public class MonolingualCorpus {
 	
 	/**
 	 * Constructeur
-	 */
+	 **/
 	public MonolingualCorpus(String fileName, String langue){
 		this.setLangue(langue);
 		dictionnaire = new HashMap<String, Integer>();
@@ -56,7 +56,8 @@ public class MonolingualCorpus {
 			while ((ligne=br.readLine())!=null){
 				// On parse la ligne en enlevant les espaces
 				tab = ligne.split(" ");
-				
+				System.out.println(ligne);
+				System.out.println("size "+tab.length);
 				// On prend en compte que les lignes de la langue
 				if(tab[1].equals(langue)){
 					
@@ -73,15 +74,12 @@ public class MonolingualCorpus {
 					// On remplit la variable corpus
 					corpus.add(reelleLigne);
 					
-					// On lit le tableau pars�
-
-					
+					// On lit le tableau pars�			
 			
 					for(i=2; i<tab.length; i++){
 						
 						// On transforme la chaine en minuscule
 						token = tab[i].toLowerCase();
-						
 
 						// Si on tombe sur le caract�re de fin de paragraphe $$
 						if(token.equals("$$") && !tab_token.containsKey(val_$$)){
@@ -238,6 +236,9 @@ public class MonolingualCorpus {
 	}
 	
 	/**
+	 * 
+	 * @param ligne
+	 * @param tab
 	 * Permet d'enlever des caract�res de ponctuation eventuellement present 
 	 * @return un string, la "vraie" ligne, sans l'integer et la langue au d�but de la ligne
 	 */
@@ -329,7 +330,7 @@ public class MonolingualCorpus {
 	 * Main pour tester cette classe AVEC LES DONNEES DE TATOEBA UNIQUEMENT
 	 */
 	public static void main(String[] args){
-		String fileName = "";	// A CHANGER AVANT DE TESTER
+		String fileName = "test.csv";	// A CHANGER AVANT DE TESTER
 		MonolingualCorpus test = new MonolingualCorpus(fileName, "fra");
 		
 		// Si on arrive jusqu'ici, c'est que le load n'a pas g�n�rer d'erreur
