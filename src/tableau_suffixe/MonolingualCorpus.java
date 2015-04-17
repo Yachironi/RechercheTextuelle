@@ -41,6 +41,7 @@ public class MonolingualCorpus {
 		this.setLangue(langue);
 		dictionnaire = new HashMap<String, Integer>();
 		tab_token = new HashMap<Integer, ArrayList<Integer>>();
+		corpus = new ArrayList<Integer>();
 		if(!loadFromFile(fileName, langue)){
 			System.err.println("Erreur dans le chargement du fichier -" + fileName + "-");
 			//System.exit(0);
@@ -53,7 +54,7 @@ public class MonolingualCorpus {
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF8"));
 			String ligne, token, reelleLigne;
 			String[] tab;
-			int val = val_$$++;		// valeur numerique des autres caracteres
+			int val = val_$$+1;		// valeur numerique des autres caracteres
 			int pos = 0;			// position du token dans le corpus
 			int i, id_ligne, val_token;
 			
@@ -70,7 +71,7 @@ public class MonolingualCorpus {
 			
 			// Ajout du caractere $$ dans le dictionnaire. On lui associe la valeur 0
 			dictionnaire.put("$$", val_$$);
-			
+						
 			// On parcours l'ensemble du corpus
 			while ((ligne=br.readLine())!=null){
 				// On parse la ligne en enlevant les espaces
@@ -81,8 +82,7 @@ public class MonolingualCorpus {
 
 					// On lit le tableau parse (on commence a i=2 car on prend pas le int
 					// et la langue
-					for(i=2; i<tab.length; i++){
-						
+					for(i=2; i<tab.length; i++){						
 						// On transforme la chaine en minuscule
 						token = tab[i].toLowerCase();
 						
@@ -100,6 +100,7 @@ public class MonolingualCorpus {
 						}
 						// Cas ou tab_token ne contient pas la valeur du token
 						else{
+							System.out.println("token = " + token + " ligne = " + id_ligne);
 							tab_token.put(val_token, new ArrayList<Integer>(id_ligne));
 						}
 						
@@ -323,7 +324,7 @@ public class MonolingualCorpus {
 	 * Main pour tester cette classe AVEC LES DONNEES DE TATOEBA UNIQUEMENT
 	 */
 	public static void main(String[] args){
-		String fileName = "test.csv";	// A CHANGER AVANT DE TESTER
+		String fileName = "sentences.csv";	// A CHANGER AVANT DE TESTER
 		MonolingualCorpus test = new MonolingualCorpus(fileName, "fra");
 		
 		// Si on arrive jusqu'ici, c'est que le load n'a pas g�n�rer d'erreur
