@@ -2,10 +2,16 @@ package tableau_suffixe;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+
+import opennlp.tools.tokenize.Tokenizer;
+import opennlp.tools.tokenize.TokenizerME;
+import opennlp.tools.tokenize.TokenizerModel;
 
 public class MonolingualCorpus {
 	/**
@@ -16,7 +22,11 @@ public class MonolingualCorpus {
 	private HashMap<String, Integer> dictionnaire;	// string = token, integer = valeur
 	private HashMap<Integer, Integer> tab_token;	// int = valeur, int = position
 	private String langue;
+	private  InputStream is;
+	private  TokenizerModel model;
+	private  Tokenizer tokenizer;
 	
+
 	
 	/**
 	 * Constructeur
@@ -47,9 +57,21 @@ public class MonolingualCorpus {
 			int pos = 0;			// position du token dans le corpus
 			int i;
 			
+			is = new FileInputStream("fr-token.bin");
+			 
+			model = null;
+			try {
+				model = new TokenizerModel(is);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		 
+			tokenizer = new TokenizerME(model);
+			
 			// Ajout du caract�re $$ dans le dictionnaire. On lui associe la valeur 0
 			dictionnaire.put("$$", val_$$);
-			
+						
 			// On lit une ligne
 			while ((ligne=br.readLine())!=null){
 				// On parse la ligne en enlevant les espaces
@@ -120,6 +142,7 @@ public class MonolingualCorpus {
 				}
 			}
 			setNbMotTotal(pos+1);
+			is.close();
 			return true;
 		}
 		catch(Exception e){
@@ -362,5 +385,9 @@ public class MonolingualCorpus {
 		    System.out.println("(" + entry2.getKey() + ", " + entry2.getValue() + ")");
 		}
 		System.out.println("--------------------------------");
+	}
+	
+	public String[] tokenize(String chaine){
+		return tokenizer.tokenize(chaine);
 	}
 }
