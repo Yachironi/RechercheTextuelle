@@ -17,10 +17,10 @@ public class MonolingualCorpus {
 	/**
 	 * Attributs
 	 */
-	private ArrayList<String> corpus;				// contient tout le corpus (ensemble de lignes)
+	private ArrayList<Integer> corpus;				// contient tout le corpus (ensemble de lignes)
 	private int nbMotTotal;							// Le nombre de mot dans le corpus
 	private HashMap<String, Integer> dictionnaire;	// string = token, integer = valeur
-	private HashMap<Integer, Integer> tab_token;	// int = valeur, int = position
+	private HashMap<Integer, ArrayList<Integer>> tab_token;	// int = valeur, int = position
 	private String langue;
 	private  InputStream is;
 	private  TokenizerModel model;
@@ -30,11 +30,11 @@ public class MonolingualCorpus {
 	
 	/**
 	 * Constructeur
-	 */
+	 **/
 	public MonolingualCorpus(String fileName, String langue){
 		this.setLangue(langue);
 		dictionnaire = new HashMap<String, Integer>();
-		tab_token = new HashMap<Integer, Integer>();
+		tab_token = new HashMap<Integer, ArrayList<Integer>>();
 		if(!loadFromFile(fileName, langue)){
 			System.err.println("Erreur dans le chargement du fichier -" + fileName + "-");
 			//System.exit(0);
@@ -48,6 +48,8 @@ public class MonolingualCorpus {
 	 * @return true si le chargement se fait correctement, false sinon
 	 */
 	public boolean loadFromFile(String fileName, String langue){
+		return true;
+		/*
 		try{
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF8"));
 			String ligne, token, reelleLigne;
@@ -76,7 +78,8 @@ public class MonolingualCorpus {
 			while ((ligne=br.readLine())!=null){
 				// On parse la ligne en enlevant les espaces
 				tab = ligne.split(" ");
-				
+				System.out.println(ligne);
+				System.out.println("size "+tab.length);
 				// On prend en compte que les lignes de la langue
 				if(tab[1].equals(langue)){
 					
@@ -93,19 +96,12 @@ public class MonolingualCorpus {
 					// On remplit la variable corpus
 					corpus.add(reelleLigne);
 					
-					// On lit le tableau pars�
-
-					
-					/**
-					 *Remarque : on commence a i=2 car a 
-					 * - i=0 : c'est un integer (on en fait rien??)
-					 * - i=1 : c'est la langue
-					 */
+					// On lit le tableau pars�			
+			
 					for(i=2; i<tab.length; i++){
 						
 						// On transforme la chaine en minuscule
 						token = tab[i].toLowerCase();
-						
 
 						// Si on tombe sur le caract�re de fin de paragraphe $$
 						if(token.equals("$$") && !tab_token.containsKey(val_$$)){
@@ -116,9 +112,9 @@ public class MonolingualCorpus {
 						// Autre que caract�re $$
 						else{
 							char firstLettre = token.charAt(0);
-							/** A MODIFIER : ce if dit qu'on accepte que les tokens qui commence par
+							** A MODIFIER : ce if dit qu'on accepte que les tokens qui commence par
 							 * un chiffre ou une lettre ==> Necessaire?
-							 */
+							 
 							// Le token doit commencer par une lettre ou un chiffre
 							if((firstLettre>='a' && firstLettre<='z') || (firstLettre>='0' && firstLettre<='9')){
 							
@@ -149,6 +145,7 @@ public class MonolingualCorpus {
 			System.out.println(e.toString());
 			return false;
 		}
+		*/
 	}
 
 	/**
@@ -157,6 +154,8 @@ public class MonolingualCorpus {
 	 * @return le token present dans le corpus a la position passee en parametre
 	 */
 	public String getTokenAtPosition(int position){
+		return null;
+		/*
 		// Parcours de tab_token (valeur, position)
 		for(Entry<Integer, Integer> entry : tab_token.entrySet()) {
 		    Integer cle_tab_token = entry.getKey();
@@ -177,6 +176,7 @@ public class MonolingualCorpus {
 		    }
 		}
 		return null;
+		*/
 	}
 	
 	/**
@@ -186,6 +186,8 @@ public class MonolingualCorpus {
 	 * @return le suffixe present a la position passee en parametre dans le corpus
 	 */
 	public String getSuffixFromPosition(int position){
+		return null;
+		/*
 		String suffixe = "";
 		int i, j;
 		int nbMots = 0;
@@ -222,6 +224,7 @@ public class MonolingualCorpus {
 			return suffixe.substring(0, suffixe.length()-2);
 		}
 		return null;
+		*/
 	}
 	
 	/**
@@ -251,7 +254,14 @@ public class MonolingualCorpus {
 	 * Methodes auxiliaires
 	 */
 	
+	public int getEncodedString(String token){
+		return 0;
+	}
+	
 	/**
+	 * 
+	 * @param ligne
+	 * @param tab
 	 * Permet d'enlever des caract�res de ponctuation eventuellement present 
 	 * @return un string, la "vraie" ligne, sans l'integer et la langue au d�but de la ligne
 	 */
@@ -314,11 +324,11 @@ public class MonolingualCorpus {
 		this.dictionnaire = dictionnaire;
 	}
 
-	public HashMap<Integer, Integer> getTab_token() {
+	public HashMap<Integer, ArrayList<Integer>> getTab_token() {
 		return tab_token;
 	}
 
-	public void setTab_token(HashMap<Integer, Integer> tab_token) {
+	public void setTab_token(HashMap<Integer, ArrayList<Integer>> tab_token) {
 		this.tab_token = tab_token;
 	}
 
@@ -343,7 +353,7 @@ public class MonolingualCorpus {
 	 * Main pour tester cette classe AVEC LES DONNEES DE TATOEBA UNIQUEMENT
 	 */
 	public static void main(String[] args){
-		String fileName = "";	// A CHANGER AVANT DE TESTER
+		String fileName = "test.csv";	// A CHANGER AVANT DE TESTER
 		MonolingualCorpus test = new MonolingualCorpus(fileName, "fra");
 		
 		// Si on arrive jusqu'ici, c'est que le load n'a pas g�n�rer d'erreur
@@ -379,12 +389,21 @@ public class MonolingualCorpus {
 		
 		/**
 		 * Affichage de tab_token
-		 */
+		 
 		System.out.println("-----------Tab_token------------");
 		for(Entry<Integer, Integer> entry2 : test.getTab_token().entrySet()) {
 		    System.out.println("(" + entry2.getKey() + ", " + entry2.getValue() + ")");
 		}
 		System.out.println("--------------------------------");
+		*/
+	}
+
+	public ArrayList<Integer> getCorpus() {
+		return corpus;
+	}
+
+	public void setCorpus(ArrayList<Integer> corpus) {
+		this.corpus = corpus;
 	}
 	
 	public String[] tokenize(String chaine){
