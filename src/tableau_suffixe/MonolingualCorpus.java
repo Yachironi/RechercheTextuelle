@@ -373,4 +373,12 @@ public class MonolingualCorpus {
 		System.out.println("--------------------------------");
 		*/
 	}
+
+	public ArrayList<Integer> getCorpus() {
+		return corpus;
+	}
+
+	public void setCorpus(ArrayList<Integer> corpus) {
+		this.corpus = corpus;
+	}
 }
