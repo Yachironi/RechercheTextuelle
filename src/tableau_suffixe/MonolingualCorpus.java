@@ -27,7 +27,7 @@ public class MonolingualCorpus {
 		tab_token = new HashMap<Integer, Integer>();
 		if(!loadFromFile(fileName, langue)){
 			System.err.println("Erreur dans le chargement du fichier -" + fileName + "-");
-			System.exit(0);
+			//System.exit(0);
 		}
 		
 	}
@@ -206,7 +206,18 @@ public class MonolingualCorpus {
 	 * @return
 	 */
 	public int compareSuffixes(int position1, int position2){
-		return 0;
+		String chaine1 = getSuffixFromPosition(position1);
+		String chaine2 = getSuffixFromPosition(position2);
+		if(chaine1.equals(chaine2) || position1 == position2 ) return 0;
+		int min = Math.min(chaine1.length(),chaine2.length());
+		chaine1.toLowerCase();
+		chaine2.toLowerCase();
+		for(int i=0; i<min; i++){		
+			if(chaine1.charAt(i) > chaine2.charAt(i)) return 1;
+			else if(chaine1.charAt(i) < chaine2.charAt(i)) return -1;
+		}
+		if(chaine1.length()>chaine2.length()) return 1;
+		else return -1;
 	}
 	
 	
@@ -309,9 +320,8 @@ public class MonolingualCorpus {
 	 * Main pour tester cette classe AVEC LES DONNEES DE TATOEBA UNIQUEMENT
 	 */
 	public static void main(String[] args){
-		String fileName = "";	// A CHANGER AVANT DE TESTER
+		String fileName = "sentences.csv";	// A CHANGER AVANT DE TESTER
 		MonolingualCorpus test = new MonolingualCorpus(fileName, "fra");
-		
 		// Si on arrive jusqu'ici, c'est que le load n'a pas g�n�rer d'erreur
 		
 		/**
