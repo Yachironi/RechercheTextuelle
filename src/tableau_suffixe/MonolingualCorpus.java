@@ -72,6 +72,7 @@ public class MonolingualCorpus {
 					corpus.add(reelleLigne);
 					
 					// On lit le tableau pars�
+
 					
 					/**
 					 *Remarque : on commence a i=2 car a 
@@ -83,6 +84,7 @@ public class MonolingualCorpus {
 						// On transforme la chaine en minuscule
 						token = tab[i].toLowerCase();
 						
+
 						// Si on tombe sur le caract�re de fin de paragraphe $$
 						if(token.equals("$$") && !tab_token.containsKey(val_$$)){
 							// On ajoute la position du $$
@@ -227,9 +229,7 @@ public class MonolingualCorpus {
 	 */
 	
 	/**
-	 * 
-	 * @param ligne
-	 * @param tab
+	 * Permet d'enlever des caract�res de ponctuation eventuellement present 
 	 * @return un string, la "vraie" ligne, sans l'integer et la langue au d�but de la ligne
 	 */
 	private String reelleLigne(String ligne, String[] tab) {
@@ -320,8 +320,9 @@ public class MonolingualCorpus {
 	 * Main pour tester cette classe AVEC LES DONNEES DE TATOEBA UNIQUEMENT
 	 */
 	public static void main(String[] args){
-		String fileName = "sentences.csv";	// A CHANGER AVANT DE TESTER
+		String fileName = "";	// A CHANGER AVANT DE TESTER
 		MonolingualCorpus test = new MonolingualCorpus(fileName, "fra");
+		
 		// Si on arrive jusqu'ici, c'est que le load n'a pas g�n�rer d'erreur
 		
 		/**
