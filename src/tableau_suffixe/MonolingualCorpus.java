@@ -11,10 +11,10 @@ public class MonolingualCorpus {
 	/**
 	 * Attributs
 	 */
-	private ArrayList<String> corpus;				// contient tout le corpus (ensemble de lignes)
+	private ArrayList<Integer> corpus;				// contient tout le corpus (ensemble de lignes)
 	private int nbMotTotal;							// Le nombre de mot dans le corpus
 	private HashMap<String, Integer> dictionnaire;	// string = token, integer = valeur
-	private HashMap<Integer, Integer> tab_token;	// int = valeur, int = position
+	private HashMap<Integer, ArrayList<Integer>> tab_token;	// int = valeur, int = position
 	private String langue;
 	
 	
@@ -24,7 +24,7 @@ public class MonolingualCorpus {
 	public MonolingualCorpus(String fileName, String langue){
 		this.setLangue(langue);
 		dictionnaire = new HashMap<String, Integer>();
-		tab_token = new HashMap<Integer, Integer>();
+		tab_token = new HashMap<Integer, ArrayList<Integer>>();
 		if(!loadFromFile(fileName, langue)){
 			System.err.println("Erreur dans le chargement du fichier -" + fileName + "-");
 			//System.exit(0);
@@ -38,6 +38,8 @@ public class MonolingualCorpus {
 	 * @return true si le chargement se fait correctement, false sinon
 	 */
 	public boolean loadFromFile(String fileName, String langue){
+		return true;
+		/*
 		try{
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF8"));
 			String ligne, token, reelleLigne;
@@ -72,18 +74,13 @@ public class MonolingualCorpus {
 					// On remplit la variable corpus
 					corpus.add(reelleLigne);
 					
-					// On lit le tableau pars�
-					
-					/**
-					 *Remarque : on commence a i=2 car a 
-					 * - i=0 : c'est un integer (on en fait rien??)
-					 * - i=1 : c'est la langue
-					 */
+					// On lit le tableau pars�			
+			
 					for(i=2; i<tab.length; i++){
 						
 						// On transforme la chaine en minuscule
 						token = tab[i].toLowerCase();
-						
+
 						// Si on tombe sur le caract�re de fin de paragraphe $$
 						if(token.equals("$$") && !tab_token.containsKey(val_$$)){
 							// On ajoute la position du $$
@@ -93,9 +90,9 @@ public class MonolingualCorpus {
 						// Autre que caract�re $$
 						else{
 							char firstLettre = token.charAt(0);
-							/** A MODIFIER : ce if dit qu'on accepte que les tokens qui commence par
+							** A MODIFIER : ce if dit qu'on accepte que les tokens qui commence par
 							 * un chiffre ou une lettre ==> Necessaire?
-							 */
+							 
 							// Le token doit commencer par une lettre ou un chiffre
 							if((firstLettre>='a' && firstLettre<='z') || (firstLettre>='0' && firstLettre<='9')){
 							
@@ -125,6 +122,7 @@ public class MonolingualCorpus {
 			System.out.println(e.toString());
 			return false;
 		}
+		*/
 	}
 
 	/**
@@ -133,6 +131,8 @@ public class MonolingualCorpus {
 	 * @return le token present dans le corpus a la position passee en parametre
 	 */
 	public String getTokenAtPosition(int position){
+		return null;
+		/*
 		// Parcours de tab_token (valeur, position)
 		for(Entry<Integer, Integer> entry : tab_token.entrySet()) {
 		    Integer cle_tab_token = entry.getKey();
@@ -153,6 +153,7 @@ public class MonolingualCorpus {
 		    }
 		}
 		return null;
+		*/
 	}
 	
 	/**
@@ -162,6 +163,8 @@ public class MonolingualCorpus {
 	 * @return le suffixe present a la position passee en parametre dans le corpus
 	 */
 	public String getSuffixFromPosition(int position){
+		return null;
+		/*
 		String suffixe = "";
 		int i, j;
 		int nbMots = 0;
@@ -198,6 +201,7 @@ public class MonolingualCorpus {
 			return suffixe.substring(0, suffixe.length()-2);
 		}
 		return null;
+		*/
 	}
 	
 	/**
@@ -207,7 +211,18 @@ public class MonolingualCorpus {
 	 * @return
 	 */
 	public int compareSuffixes(int position1, int position2){
-		return 0;
+		String chaine1 = getSuffixFromPosition(position1);
+		String chaine2 = getSuffixFromPosition(position2);
+		if(chaine1.equals(chaine2) || position1 == position2 ) return 0;
+		int min = Math.min(chaine1.length(),chaine2.length());
+		chaine1.toLowerCase();
+		chaine2.toLowerCase();
+		for(int i=0; i<min; i++){		
+			if(chaine1.charAt(i) > chaine2.charAt(i)) return 1;
+			else if(chaine1.charAt(i) < chaine2.charAt(i)) return -1;
+		}
+		if(chaine1.length()>chaine2.length()) return 1;
+		else return -1;
 	}
 	
 	
@@ -216,10 +231,15 @@ public class MonolingualCorpus {
 	 * Methodes auxiliaires
 	 */
 	
+	public int getEncodedString(String token){
+		return 0;
+	}
+	
 	/**
 	 * 
 	 * @param ligne
 	 * @param tab
+	 * Permet d'enlever des caract�res de ponctuation eventuellement present 
 	 * @return un string, la "vraie" ligne, sans l'integer et la langue au d�but de la ligne
 	 */
 	private String reelleLigne(String ligne, String[] tab) {
@@ -281,11 +301,11 @@ public class MonolingualCorpus {
 		this.dictionnaire = dictionnaire;
 	}
 
-	public HashMap<Integer, Integer> getTab_token() {
+	public HashMap<Integer, ArrayList<Integer>> getTab_token() {
 		return tab_token;
 	}
 
-	public void setTab_token(HashMap<Integer, Integer> tab_token) {
+	public void setTab_token(HashMap<Integer, ArrayList<Integer>> tab_token) {
 		this.tab_token = tab_token;
 	}
 
@@ -346,11 +366,12 @@ public class MonolingualCorpus {
 		
 		/**
 		 * Affichage de tab_token
-		 */
+		 
 		System.out.println("-----------Tab_token------------");
 		for(Entry<Integer, Integer> entry2 : test.getTab_token().entrySet()) {
 		    System.out.println("(" + entry2.getKey() + ", " + entry2.getValue() + ")");
 		}
 		System.out.println("--------------------------------");
+		*/
 	}
 }
