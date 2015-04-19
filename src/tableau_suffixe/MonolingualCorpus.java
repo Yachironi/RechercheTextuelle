@@ -10,7 +10,9 @@ import java.io.LineNumberReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.StringTokenizer;
 
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
@@ -156,8 +158,7 @@ public class MonolingualCorpus {
 		}
 
 		// On recupere la valeur du token
-		int val_token = corpus.get(position);
-
+		int val_token = position;
 		// On cherche le token dans le dictionnaire
 		for (Entry<String, Integer> entry : dictionnaire.entrySet()) {
 			if (entry.getValue() == val_token) {
@@ -181,16 +182,21 @@ public class MonolingualCorpus {
 	 *         corpus
 	 */
 	public String getSuffixFromPosition(int position) {
-		int pos_debut_phrase = getDebutPhrase(position);
+		//int pos_debut_phrase = getDebutPhrase(position);
+		int pos_debut_phrase = position;
 		int pos_fin_phrase = getFinPhrase(position);
 		String suffixe = "";
-		for (int i = pos_debut_phrase; i < pos_fin_phrase; i++) {
+		for (int i = pos_debut_phrase; i < pos_fin_phrase-1; i++) {
+			//System.out.println("i = "+ i);
+			
 			suffixe = suffixe + getTokenAtPosition(corpus.get(i)) + " ";
+			//suffixe = suffixe + getTokenAtPosition(tab_token.get(corpus.get(i)).get(position)) + " ";
+			
 		}
-		return suffixe.substring(0, suffixe.length() - 2);
+		return suffixe;
 	}
 
-	private int getFinPhrase(int position) {
+	public int getFinPhrase(int position) {
 		// Message d'erreur si position est incorrecte
 		if (position >= corpus.size()) {
 			System.err.println("La position n'est pas dans le corpus");
@@ -208,7 +214,7 @@ public class MonolingualCorpus {
 		return i + 1;
 	}
 
-	private int getDebutPhrase(int position) {
+	public int getDebutPhrase(int position) {
 		// Message d'erreur si position est incorrecte
 		if (position >= corpus.size()) {
 			System.err.println("La position n'est pas dans le corpus");
@@ -255,8 +261,13 @@ public class MonolingualCorpus {
 	 * Methodes auxiliaires
 	 */
 
-	public int getEncodedString(String token) {
-		return 0;
+	public ArrayList<Integer> getEncodedString(String phrase) {
+		String[] tokens= tokenizer.tokenize(phrase);
+		ArrayList<Integer> resultat = new ArrayList<>();
+		for (int i = 0; i < tokens.length; i++) {
+			resultat.add(dictionnaire.get(tokens[i]));	
+		}
+		return resultat;
 	}
 
 	/**
@@ -348,7 +359,7 @@ public class MonolingualCorpus {
 	 * Main pour tester cette classe AVEC LES DONNEES DE TATOEBA UNIQUEMENT
 	 */
 	public static void main(String[] args) {
-		String fileName = "sentences.csv"; // A CHANGER AVANT DE TESTER
+		String fileName = "test.csv"; // A CHANGER AVANT DE TESTER
 		MonolingualCorpus test = new MonolingualCorpus(fileName, "fra");
 
 		// Si on arrive jusqu'ici, c'est que le load n'a pas g�n�rer d'erreur
@@ -356,7 +367,7 @@ public class MonolingualCorpus {
 		/**
 		 * Test de getTokenAtPosition
 		 */
-		int position = 4; // A CHANGER EN FONCTION DU FICHIER
+		int position = 1; // A CHANGER EN FONCTION DU FICHIER
 		System.out.println("Test de getTokenAtPosition a la position "
 				+ position);
 		System.out.println("---> " + test.getTokenAtPosition(position));
@@ -391,6 +402,8 @@ public class MonolingualCorpus {
 		 * { System.out.println("(" + entry2.getKey() + ", " + entry2.getValue()
 		 * + ")"); } System.out.println("--------------------------------");
 		 */
+		System.out.println(test.getCorpus());
+		SuffixArray suffixArray = new SuffixArray(test);
 	}
 
 	public ArrayList<Integer> getCorpus() {
