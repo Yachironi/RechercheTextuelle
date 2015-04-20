@@ -32,12 +32,12 @@ public class SuffixArray {
 			}
 		}
 
-		System.out.println(suffixArray);
+		/*System.out.println(suffixArray);
 		
 		for(int i=0; i<suffixArray.size();i++){
 			System.out.println(corpus.getSuffixFromPosition(suffixArray.get(i)));
 			
-		}
+		}*/
 		Comparator<Integer> comparator = new Comparator<Integer>() {
 			@Override
 			public int compare(Integer o1, Integer o2) {
@@ -45,12 +45,12 @@ public class SuffixArray {
 			}
 		};
 		Collections.sort(suffixArray, comparator);
-		System.out.println(suffixArray);
 		
 		
 		for(int i=0;i<suffixArray.size();i++){
 			System.out.println(corpus.getSuffixFromPosition(suffixArray.get(i)));	
 		}
+		
 		
 		setLcp();
 		for(int i=0;i<lcpArray.size();i++){
@@ -74,17 +74,15 @@ public class SuffixArray {
 		{
 			int tmp =0;
 			ArrayList<Integer> encodedString1 = corpus.getEncodedPhrase(corpus.getSuffixFromPosition(suffixArray.get(i-1)));
-			ArrayList<Integer> encodedString2 = corpus.getEncodedPhrase(corpus.getSuffixFromPosition(suffixArray.get(1)));
+			ArrayList<Integer> encodedString2 = corpus.getEncodedPhrase(corpus.getSuffixFromPosition(suffixArray.get(i)));
 			
 			int min = Math.min(encodedString1.size(), encodedString2.size());
 			for(int j=0;j<min;j++){
 				if(encodedString1.get(j) == encodedString2.get(j))
 				{
-					System.out.println("IF"+encodedString1.get(j)+" "+encodedString2.get(j));
 					tmp++;
 				}
 				else{
-					System.out.println("ELSE");
 					lcpArray.add(tmp);
 					break;
 				}
