@@ -1,9 +1,9 @@
 package tableau_suffixe;
 
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -12,10 +12,15 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.StringTokenizer;
 
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
@@ -59,7 +64,20 @@ public class MonolingualCorpus implements Serializable{
 		dictionnaire = new HashMap<String, Integer>();
 		tab_token = new HashMap<Integer, ArrayList<Integer>>();
 		corpus = new ArrayList<Integer>();
-		
+		try {
+			is = new FileInputStream("fr-token.bin");
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		model = null;
+		try {
+			model = new TokenizerModel(is);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		tokenizer = new TokenizerME(model);
 		// Cas ou il existe un fichier contenant les structures
 		if(isWritenInFile(fileName_structure)){
 			System.out.println("Ce fichier a deja ete serialize : LECTURE");
@@ -106,15 +124,7 @@ public class MonolingualCorpus implements Serializable{
 			int i, id_ligne, val_token;
 
 			// Mise en place de la tokenisation
-			is = new FileInputStream("fr-token.bin");
-			model = null;
-			try {
-				model = new TokenizerModel(is);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			tokenizer = new TokenizerME(model);
+			
 
 			// Ajout du caractere $$ dans le dictionnaire. On lui associe la
 			// valeur 0
@@ -218,6 +228,15 @@ public class MonolingualCorpus implements Serializable{
 	 *         corpus
 	 */
 	public String getSuffixFromPosition(int position) {
+		// Message d'erreur si position est incorrecte
+		if (position >= corpus.size()) {
+			System.err.println("La position n'est pas dans le corpus");
+			System.exit(0);
+		}
+		if(corpus.get(position) == val_$$){
+			return "";
+		}
+		
 		int pos_debut_phrase = position;
 		int pos_fin_phrase = getFinPhrase(position);
 		String suffixe = "";
@@ -282,7 +301,7 @@ public class MonolingualCorpus implements Serializable{
 	 * @param position
 	 * @return
 	 */
-	private int getFinPhrase(int position) {
+	public int getFinPhrase(int position) {
 		// Message d'erreur si position est incorrecte
 		if (position >= corpus.size()) {
 			System.err.println("La position n'est pas dans le corpus");
@@ -537,11 +556,12 @@ public class MonolingualCorpus implements Serializable{
 	 * @return
 	 */
 	public ArrayList<Integer> getEncodedPhrase(String phrase) {
-		String[] tokens= tokenizer.tokenize(phrase);
+		String[] tokens= tokenize(phrase);
 		ArrayList<Integer> resultat = new ArrayList<>();
 		for (int i = 0; i < tokens.length; i++) {
 			resultat.add(dictionnaire.get(tokens[i]));	
 		}
+		System.out.println("ici pas de soucis");
 		return resultat;
 	}
 
@@ -634,15 +654,14 @@ public class MonolingualCorpus implements Serializable{
 	 * Main pour tester cette classe AVEC LES DONNEES DE TATOEBA UNIQUEMENT
 	 */
 	public static void main(String[] args) {
-		String fileName = "Files/test.csv"; // A CHANGER AVANT DE TESTER
+		String fileName = "Files/test_bug.csv"; // A CHANGER AVANT DE TESTER
 		MonolingualCorpus test = new MonolingualCorpus(fileName, "fra");
-
 		// Si on arrive jusqu'ici, c'est que le load n'a pas g�n�rer d'erreur
 
 		/**
 		 * Test de getTokenAtPosition
 		 */
-		int position = 0; // A CHANGER EN FONCTION DU FICHIER
+		/*int position = 0; // A CHANGER EN FONCTION DU FICHIER
 		System.out.println("Test de getTokenAtPosition a la position "
 				+ position);
 		System.out.println("---> " + test.getTokenAtPosition(position));
@@ -654,7 +673,7 @@ public class MonolingualCorpus implements Serializable{
 		 * Test de getSuffixFromPosition
 		 * 
 		 */
-		position = 4; // A CHANGER EN FONCTION DU FICHIER
+		/*position = 3; // A CHANGER EN FONCTION DU FICHIER
 		System.out.println("Test de getTokenAtPosition a la position "
 				+ position);
 		System.out.println("---> " + test.getTokenAtPosition(position));
@@ -667,11 +686,20 @@ public class MonolingualCorpus implements Serializable{
 		/**
 		 * Test de getPhraseFromPosition
 		 */
-		position = 4; // A CHANGER EN FONCTION DU FICHIER
+		/*position = 3; // A CHANGER EN FONCTION DU FICHIER
 		System.out.println("Test de getPhraseFromPosition a la position "
 				+ position);
 		System.out.println("---> " + test.getPhraseFromPosition(position));
+		*/
 		
+		System.out.println("---------Dictionnaire------------");
+		for (Entry<String, Integer> entry : test.getDictionnaire().entrySet()) {
+			System.out.println("(" + entry.getKey() + ", " + entry.getValue()
+					+ ")");
+		}
+		System.out.println("---------------------------------");
+
+		SuffixArray test1 = new SuffixArray(test);
 
 		/**
 		 * Test de compareSuffixes
