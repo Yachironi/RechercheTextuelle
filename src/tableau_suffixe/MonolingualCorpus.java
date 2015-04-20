@@ -353,7 +353,7 @@ public class MonolingualCorpus implements Serializable{
 			f.createNewFile();
 			ObjectOutputStream oos =  new ObjectOutputStream(new FileOutputStream(f)) ;
 			
-			// sérialization de l'objet
+			// sï¿½rialization de l'objet
 			oos.writeObject(corpus);
 	    	oos.writeObject(dictionnaire);
 	    	oos.writeObject(tab_token);
@@ -386,7 +386,7 @@ public class MonolingualCorpus implements Serializable{
 			
 			output.close();
 			//et on le ferme
-			System.out.println("fichier créé");
+			System.out.println("fichier crï¿½ï¿½");
 		}
 		catch(IOException ioe){
 			System.out.print("Erreur : ");
@@ -400,7 +400,7 @@ public class MonolingualCorpus implements Serializable{
 		/*
 		
 		FileWriter writer = null;
-		String texte = "texte à insérer à la fin du fichier";
+		String texte = "texte ï¿½ insï¿½rer ï¿½ la fin du fichier";
 		try{
 		     writer = new FileWriter("fichier.txt", true);
 		     writer.write(texte,0,texte.length());
@@ -561,7 +561,6 @@ public class MonolingualCorpus implements Serializable{
 		for (int i = 0; i < tokens.length; i++) {
 			resultat.add(dictionnaire.get(tokens[i]));	
 		}
-		System.out.println("ici pas de soucis");
 		return resultat;
 	}
 
@@ -654,7 +653,7 @@ public class MonolingualCorpus implements Serializable{
 	 * Main pour tester cette classe AVEC LES DONNEES DE TATOEBA UNIQUEMENT
 	 */
 	public static void main(String[] args) {
-		String fileName = "Files/test_bug.csv"; // A CHANGER AVANT DE TESTER
+		String fileName = "Files/test2.csv"; // A CHANGER AVANT DE TESTER
 		MonolingualCorpus test = new MonolingualCorpus(fileName, "fra");
 		// Si on arrive jusqu'ici, c'est que le load n'a pas gï¿½nï¿½rer d'erreur
 
@@ -673,7 +672,7 @@ public class MonolingualCorpus implements Serializable{
 		 * Test de getSuffixFromPosition
 		 * 
 		 */
-		/*position = 3; // A CHANGER EN FONCTION DU FICHIER
+		int position = 4; // A CHANGER EN FONCTION DU FICHIER
 		System.out.println("Test de getTokenAtPosition a la position "
 				+ position);
 		System.out.println("---> " + test.getTokenAtPosition(position));
@@ -698,7 +697,8 @@ public class MonolingualCorpus implements Serializable{
 					+ ")");
 		}
 		System.out.println("---------------------------------");
-
+		
+		System.out.println(test.getTab_token());
 		SuffixArray test1 = new SuffixArray(test);
 
 		/**
