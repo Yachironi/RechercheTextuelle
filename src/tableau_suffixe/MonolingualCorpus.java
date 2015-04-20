@@ -12,15 +12,10 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map.Entry;
-import java.util.StringTokenizer;
 
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
@@ -353,7 +348,7 @@ public class MonolingualCorpus implements Serializable{
 			f.createNewFile();
 			ObjectOutputStream oos =  new ObjectOutputStream(new FileOutputStream(f)) ;
 			
-			// sérialization de l'objet
+			// sï¿½rialization de l'objet
 			oos.writeObject(corpus);
 	    	oos.writeObject(dictionnaire);
 	    	oos.writeObject(tab_token);
@@ -386,7 +381,7 @@ public class MonolingualCorpus implements Serializable{
 			
 			output.close();
 			//et on le ferme
-			System.out.println("fichier créé");
+			System.out.println("fichier crï¿½ï¿½");
 		}
 		catch(IOException ioe){
 			System.out.print("Erreur : ");
@@ -400,7 +395,7 @@ public class MonolingualCorpus implements Serializable{
 		/*
 		
 		FileWriter writer = null;
-		String texte = "texte à insérer à la fin du fichier";
+		String texte = "texte ï¿½ insï¿½rer ï¿½ la fin du fichier";
 		try{
 		     writer = new FileWriter("fichier.txt", true);
 		     writer.write(texte,0,texte.length());
