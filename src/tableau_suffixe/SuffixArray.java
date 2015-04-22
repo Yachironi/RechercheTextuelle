@@ -14,30 +14,36 @@ public class SuffixArray {
 		suffixArray = new ArrayList<Integer>();
 		for (int i = 0; i < corpus.getCorpus().size(); i++) {
 			if (corpus.getCorpus().get(i) != 0) {
-				suffixArray.add(i); 
-				/*System.out.println(i);
-				String s = corpus.getSuffixFromPosition(i);
-				ArrayList<Integer> encodedString = corpus
-						.getEncodedPhrase(corpus.getSuffixFromPosition(i));
-				System.out.println(corpus.getSuffixFromPosition(i));
-				System.out.println(encodedString);
-				for (int j = 0 ; j < encodedString.size(); j++) {
-					//suffixArray.addAll(encodedString.subList(0, j));
-					System.out.println(encodedString.subList(j, encodedString.size()));
-					suffixArray.add(encodedString.subList(j, encodedString.size()).get(0));
-					
-				}*/
-				//System.out.println(encodedString.get(0));
+				suffixArray.add(i);
+				/*
+				 * System.out.println(i); String s =
+				 * corpus.getSuffixFromPosition(i); ArrayList<Integer>
+				 * encodedString = corpus
+				 * .getEncodedPhrase(corpus.getSuffixFromPosition(i));
+				 * System.out.println(corpus.getSuffixFromPosition(i));
+				 * System.out.println(encodedString); for (int j = 0 ; j <
+				 * encodedString.size(); j++) {
+				 * //suffixArray.addAll(encodedString.subList(0, j));
+				 * System.out.println(encodedString.subList(j,
+				 * encodedString.size()));
+				 * suffixArray.add(encodedString.subList(j,
+				 * encodedString.size()).get(0));
+				 * 
+				 * }
+				 */
+				// System.out.println(encodedString.get(0));
 				// suffixArray.add(corpus.getEncodedPhrase(corpus.getSuffixFromPosition(i)));
 			}
 		}
 
-		/*System.out.println(suffixArray);
-		
-		for(int i=0; i<suffixArray.size();i++){
-			System.out.println(corpus.getSuffixFromPosition(suffixArray.get(i)));
-			
-		}*/
+		/*
+		 * System.out.println(suffixArray);
+		 * 
+		 * for(int i=0; i<suffixArray.size();i++){
+		 * System.out.println(corpus.getSuffixFromPosition(suffixArray.get(i)));
+		 * 
+		 * }
+		 */
 		Comparator<Integer> comparator = new Comparator<Integer>() {
 			@Override
 			public int compare(Integer o1, Integer o2) {
@@ -45,18 +51,19 @@ public class SuffixArray {
 			}
 		};
 		Collections.sort(suffixArray, comparator);
-		
-		
-		for(int i=0;i<suffixArray.size();i++){
-			System.out.println(corpus.getSuffixFromPosition(suffixArray.get(i)));	
+
+		for (int i = 0; i < suffixArray.size(); i++) {
+			System.out
+					.println(corpus.getSuffixFromPosition(suffixArray.get(i)));
 		}
-		
-		
+
 		setLcp();
-		for(int i=0;i<lcpArray.size();i++){
-			System.out.println(lcpArray.get(i));
-		}
-		
+		/*
+		 * for(int i=0;i<lcpArray.size();i++){
+		 * System.out.println(lcpArray.get(i)); }
+		 */
+		System.out.println(lcpArray);
+
 	}
 
 	public MonolingualCorpus getCorpus() {
@@ -66,28 +73,32 @@ public class SuffixArray {
 	public void setCorpus(MonolingualCorpus corpus) {
 		this.corpus = corpus;
 	}
-	
-	public void setLcp(){
-		lcpArray = new ArrayList<Integer>(suffixArray.size()+1);
+
+	public void setLcp() {
+		lcpArray = new ArrayList<Integer>(suffixArray.size() + 1);
 		lcpArray.add(0);
-		for(int i=1; i<suffixArray.size();i++)
-		{
-			int tmp =0;
-			ArrayList<Integer> encodedString1 = corpus.getEncodedPhrase(corpus.getSuffixFromPosition(suffixArray.get(i-1)));
-			ArrayList<Integer> encodedString2 = corpus.getEncodedPhrase(corpus.getSuffixFromPosition(suffixArray.get(i)));
-			
+		for (int i = 1; i < suffixArray.size(); i++) {
+			int tmp = 0;
+			ArrayList<Integer> encodedString1 = corpus.getEncodedPhrase(corpus
+					.getSuffixFromPosition(suffixArray.get(i - 1)));
+			ArrayList<Integer> encodedString2 = corpus.getEncodedPhrase(corpus
+					.getSuffixFromPosition(suffixArray.get(i)));
+
 			int min = Math.min(encodedString1.size(), encodedString2.size());
-			for(int j=0;j<min;j++){
-				if(encodedString1.get(j) == encodedString2.get(j))
-				{
+			for (int j = 0; j < min; j++) {
+				if (encodedString1.get(j) == encodedString2.get(j)) {
 					tmp++;
-				}
-				else{
+				} else {
 					lcpArray.add(tmp);
 					break;
 				}
 			}
 		}
 		lcpArray.add(0);
+	}
+
+	int[] getAllPositionsOfPhrase(String phrase) {
+		return null;
+
 	}
 }

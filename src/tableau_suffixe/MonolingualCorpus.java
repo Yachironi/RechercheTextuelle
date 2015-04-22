@@ -648,7 +648,7 @@ public class MonolingualCorpus implements Serializable{
 	 * Main pour tester cette classe AVEC LES DONNEES DE TATOEBA UNIQUEMENT
 	 */
 	public static void main(String[] args) {
-		String fileName = "Files/test2.csv"; // A CHANGER AVANT DE TESTER
+		String fileName = "Files/test.csv"; // A CHANGER AVANT DE TESTER
 		MonolingualCorpus test = new MonolingualCorpus(fileName, "fra");
 		// Si on arrive jusqu'ici, c'est que le load n'a pas g�n�rer d'erreur
 
