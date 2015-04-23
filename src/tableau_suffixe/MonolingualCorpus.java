@@ -21,7 +21,7 @@ import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
 
-public class MonolingualCorpus implements Serializable{
+public class MonolingualCorpus implements Serializable {
 	/**
 	 * 
 	 */
@@ -47,7 +47,7 @@ public class MonolingualCorpus implements Serializable{
 	private InputStream is;
 	private TokenizerModel model;
 	private Tokenizer tokenizer;
-	
+
 	private String fileName_structure;
 
 	/**
@@ -74,34 +74,35 @@ public class MonolingualCorpus implements Serializable{
 		}
 		tokenizer = new TokenizerME(model);
 		// Cas ou il existe un fichier contenant les structures
-		if(isWritenInFile(fileName_structure)){
+		if (isWritenInFile(fileName_structure)) {
 			System.out.println("Ce fichier a deja ete serialize : LECTURE");
 			// Lecture
-			if(!readStructuresInFile(fileName_structure)){
-				System.err.println("Erreur dans la lecture des structures dans "
-						+ "le fichier -" + fileName_structure + "-");
+			if (!readStructuresInFile(fileName_structure)) {
+				System.err
+						.println("Erreur dans la lecture des structures dans "
+								+ "le fichier -" + fileName_structure + "-");
 				System.exit(0);
 			}
 		}
-		
+
 		// Cas ou il n'existe pas de fichier contenant les structures
-		else{
-			System.out.println("Ce fichier n'a pas deja ete serialize : ECRITURE");
+		else {
+			System.out
+					.println("Ce fichier n'a pas deja ete serialize : ECRITURE");
 			// Chargement du corpus
-			if(!loadFromFile(fileName, langue)) {
+			if (!loadFromFile(fileName, langue)) {
 				System.err.println("Erreur dans le chargement du fichier -"
 						+ fileName + "-");
 				System.exit(0);
 			}
 			// Ecriture des structures
-			if(!writeStructuresInFile(fileName_structure)){
-				System.err.println("Erreur dans l'ecriture des structures dans "
-						+ "le fichier -" + fileName_structure + "-");
+			if (!writeStructuresInFile(fileName_structure)) {
+				System.err
+						.println("Erreur dans l'ecriture des structures dans "
+								+ "le fichier -" + fileName_structure + "-");
 				System.exit(0);
 			}
 		}
-		
-		
 
 	}
 
@@ -119,13 +120,12 @@ public class MonolingualCorpus implements Serializable{
 			int i, id_ligne, val_token;
 
 			// Mise en place de la tokenisation
-			
 
 			// Ajout du caractere $$ dans le dictionnaire. On lui associe la
 			// valeur 0
 			dictionnaire.put("$$", val_$$);
 
-			int parsedLines=0;
+			int parsedLines = 0;
 			// On parcours l'ensemble du corpus
 			while ((ligne = br.readLine()) != null) {
 				// On parse la ligne en enlevant les espaces
@@ -175,7 +175,7 @@ public class MonolingualCorpus implements Serializable{
 						tab_token.get(val_$$).add(id_ligne);
 					}
 				}
-				//System.out.println(parsedLines+" / "+lines);
+				// System.out.println(parsedLines+" / "+lines);
 			}
 			is.close();
 			return true;
@@ -184,7 +184,6 @@ public class MonolingualCorpus implements Serializable{
 			return false;
 		}
 	}
-
 
 	/**
 	 * 
@@ -228,27 +227,27 @@ public class MonolingualCorpus implements Serializable{
 			System.err.println("La position n'est pas dans le corpus");
 			System.exit(0);
 		}
-		if(corpus.get(position) == val_$$){
+		if (corpus.get(position) == val_$$) {
 			return "";
 		}
-		
+
 		int pos_debut_phrase = position;
 		int pos_fin_phrase = getFinPhrase(position);
 		String suffixe = "";
-		for (int i = pos_debut_phrase; i < pos_fin_phrase-1; i++) {		
-			suffixe = suffixe + getTokenAtPosition(i) + " ";			
+		for (int i = pos_debut_phrase; i < pos_fin_phrase - 1; i++) {
+			suffixe = suffixe + getTokenAtPosition(i) + " ";
 		}
-		return suffixe.substring(0, suffixe.length()-1);
+		return suffixe.substring(0, suffixe.length() - 1);
 	}
-	
+
 	public String getPhraseFromPosition(int position) {
 		int pos_debut_phrase = getDebutPhrase(position);
 		int pos_fin_phrase = getFinPhrase(position);
 		String suffixe = "";
-		for (int i = pos_debut_phrase; i < pos_fin_phrase-1; i++) {			
-			suffixe = suffixe + getTokenAtPosition(i) + " ";			
+		for (int i = pos_debut_phrase; i < pos_fin_phrase - 1; i++) {
+			suffixe = suffixe + getTokenAtPosition(i) + " ";
 		}
-		return suffixe.substring(0, suffixe.length()-1);
+		return suffixe.substring(0, suffixe.length() - 1);
 	}
 
 	/**
@@ -290,9 +289,9 @@ public class MonolingualCorpus implements Serializable{
 		return tokenizer.tokenize(chaine);
 	}
 
-	
 	/**
 	 * Recupere la position de la fin de la phrase
+	 * 
 	 * @param position
 	 * @return
 	 */
@@ -316,6 +315,7 @@ public class MonolingualCorpus implements Serializable{
 
 	/**
 	 * Recupere la position du debut de la phrase
+	 * 
 	 * @param position
 	 * @return
 	 */
@@ -335,227 +335,183 @@ public class MonolingualCorpus implements Serializable{
 		}
 		return i + 1;
 	}
-	
+
 	/**
 	 * Ecrit les structures dans un fichier
+	 * 
 	 * @param fileName
 	 * @return true si l'ecriture s'est bien passee, false sinon
 	 */
-	public boolean writeStructuresInFile(String fileName){
+	public boolean writeStructuresInFile(String fileName) {
 		try {
 			// Ouverture flux
 			File f = new File(fileName);
 			f.createNewFile();
-			ObjectOutputStream oos =  new ObjectOutputStream(new FileOutputStream(f)) ;
-			
+			ObjectOutputStream oos = new ObjectOutputStream(
+					new FileOutputStream(f));
+
 			// s�rialization de l'objet
 			oos.writeObject(corpus);
-	    	oos.writeObject(dictionnaire);
-	    	oos.writeObject(tab_token);
-	    	oos.writeInt(val_$$);
-	    	
-	    	// Fermeture flux
-	    	oos.close();
+			oos.writeObject(dictionnaire);
+			oos.writeObject(tab_token);
+			oos.writeInt(val_$$);
+
+			// Fermeture flux
+			oos.close();
 			return true;
 
-		} 
-		catch (IOException e) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
 		/*
-		try{
-			
-			FileWriter fw = new FileWriter(adressedufichier, true);
-			
-			// le BufferedWriter output auquel on donne comme argument le FileWriter fw cree juste au dessus
-			BufferedWriter output = new BufferedWriter(fw);
-			
-			//on marque dans le fichier ou plutot dans le BufferedWriter qui sert comme un tampon(stream)
-			output.write(texte);
-			//on peut utiliser plusieurs fois methode write
-			
-			output.flush();
-			//ensuite flush envoie dans le fichier, ne pas oublier cette methode pour le BufferedWriter
-			
-			output.close();
-			//et on le ferme
-			System.out.println("fichier cr��");
-		}
-		catch(IOException ioe){
-			System.out.print("Erreur : ");
-			ioe.printStackTrace();
-			}
+		 * try{
+		 * 
+		 * FileWriter fw = new FileWriter(adressedufichier, true);
+		 * 
+		 * // le BufferedWriter output auquel on donne comme argument le
+		 * FileWriter fw cree juste au dessus BufferedWriter output = new
+		 * BufferedWriter(fw);
+		 * 
+		 * //on marque dans le fichier ou plutot dans le BufferedWriter qui sert
+		 * comme un tampon(stream) output.write(texte); //on peut utiliser
+		 * plusieurs fois methode write
+		 * 
+		 * output.flush(); //ensuite flush envoie dans le fichier, ne pas
+		 * oublier cette methode pour le BufferedWriter
+		 * 
+		 * output.close(); //et on le ferme System.out.println("fichier cr��");
+		 * } catch(IOException ioe){ System.out.print("Erreur : ");
+		 * ioe.printStackTrace(); }
+		 * 
+		 * }
+		 */
 
-	}
-	
-	*/
-		
 		/*
-		
-		FileWriter writer = null;
-		String texte = "texte � ins�rer � la fin du fichier";
-		try{
-		     writer = new FileWriter("fichier.txt", true);
-		     writer.write(texte,0,texte.length());
-		}catch(IOException ex){
-		    ex.printStackTrace();
-		}finally{
-		  if(writer != null){
-		     try {
-				writer.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		  }
-		}
-		
-		*/
-		
+		 * 
+		 * FileWriter writer = null; String texte =
+		 * "texte � ins�rer � la fin du fichier"; try{ writer = new
+		 * FileWriter("fichier.txt", true);
+		 * writer.write(texte,0,texte.length()); }catch(IOException ex){
+		 * ex.printStackTrace(); }finally{ if(writer != null){ try {
+		 * writer.close(); } catch (IOException e) { // TODO Auto-generated
+		 * catch block e.printStackTrace(); } } }
+		 */
+
 		/*
-		
-		try {
-			FileWriter f = new FileWriter("Files/structures.txt");
-			PrintWriter pw = new PrintWriter(f);
-			
-			// Ecriture du corpus
-			pw.println("corpus");
-			for(Integer i : corpus){
-				pw.println(i.toString());
-			}
-			
-			
-			// Ecriture du dictionnaire
-			pw.println("dictionnaire");
-			for (Entry<String, Integer> entry : dictionnaire.entrySet()) {
-				pw.println(entry.getKey() + " " + entry.getValue().toString());
-			}
-			
-			// Ecriture de tab_token
-			pw.println("tab_token");
-			String chaine = "";
-			for (Entry<Integer, ArrayList<Integer>> entry2 : tab_token.entrySet()) {
-				chaine = entry2.getKey().toString();
-				for(Integer j : entry2.getValue()){
-					chaine = chaine + " " + j.toString();
-				}
-				pw.println(chaine);
-			}
-			pw.close();
-			return true;
-		} catch (IOException e) {
-			return false;
-		}
-		*/
+		 * 
+		 * try { FileWriter f = new FileWriter("Files/structures.txt");
+		 * PrintWriter pw = new PrintWriter(f);
+		 * 
+		 * // Ecriture du corpus pw.println("corpus"); for(Integer i : corpus){
+		 * pw.println(i.toString()); }
+		 * 
+		 * 
+		 * // Ecriture du dictionnaire pw.println("dictionnaire"); for
+		 * (Entry<String, Integer> entry : dictionnaire.entrySet()) {
+		 * pw.println(entry.getKey() + " " + entry.getValue().toString()); }
+		 * 
+		 * // Ecriture de tab_token pw.println("tab_token"); String chaine = "";
+		 * for (Entry<Integer, ArrayList<Integer>> entry2 :
+		 * tab_token.entrySet()) { chaine = entry2.getKey().toString();
+		 * for(Integer j : entry2.getValue()){ chaine = chaine + " " +
+		 * j.toString(); } pw.println(chaine); } pw.close(); return true; }
+		 * catch (IOException e) { return false; }
+		 */
 	}
-	
+
 	/**
 	 * Lis les structures dans un fichier et les remplit dans les attributs
+	 * 
 	 * @param fileName
 	 * @return true si la lecture s'est bien passee, false sinon
 	 */
-	public boolean readStructuresInFile(String fileName){
+	public boolean readStructuresInFile(String fileName) {
 		try {
 			// Ouverture du flux
-			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(new File(fileName)));
-			
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(
+					new File(fileName)));
+
 			corpus = (ArrayList<Integer>) ois.readObject();
-		    dictionnaire = (HashMap<String, Integer>) ois.readObject();
-		    tab_token = (HashMap<Integer, ArrayList<Integer>>) ois.readObject();
-		    val_$$ = ois.readInt();
-		    
-		    // Fermeture du flux
-		    ois.close();
-		    
-		    return true;
+			dictionnaire = (HashMap<String, Integer>) ois.readObject();
+			tab_token = (HashMap<Integer, ArrayList<Integer>>) ois.readObject();
+			val_$$ = ois.readInt();
+
+			// Fermeture du flux
+			ois.close();
+
+			return true;
 		} catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
-		}	       
+		}
 
 		/*
-		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					new FileInputStream(fileName), "UTF8"));
-		
-			String ligne;
-			String[] tab;
-			
-			// Lecture de la structure corpus
-			if((ligne = br.readLine()) != null && ligne.equals("corpus")){
-				while ((ligne = br.readLine()) != null && !ligne.equals("dictionnaire")) {
-					corpus.add(Integer.parseInt(ligne));
-				}
-			}
-			else{
-				System.err.println("Erreur dans la lecture du fichier -" + fileName + "- : "
-						+ " la ligne corpus n'est pas presente");
-				System.exit(0);
-			}
-			
-			// Lecture de la structure dictionnaire
-			if((ligne = br.readLine()) != null && ligne.equals("dictionnaire")){
-				while ((ligne = br.readLine()) != null && !ligne.equals("tab_token")) {
-					tab = ligne.split(" ");
-					dictionnaire.put(tab[0], Integer.parseInt(tab[1]));
-				}
-			}
-			else{
-				System.err.println("Erreur dans la lecture du fichier -" + fileName + "- : "
-						+ " la ligne dictionnaire n'est pas presente");
-				System.exit(0);
-			}
-			
-			if((ligne = br.readLine()) != null && ligne.equals("tab_token")){
-				while ((ligne = br.readLine()) != null) {
-					tab = ligne.split(" ");
-					int l = tab.length;
-					ArrayList<Integer> list_positions = new ArrayList<Integer>();
-					for(int i=1; i<l; i++){
-						list_positions.add(Integer.parseInt(tab[i]));
-					}
-					tab_token.put(Integer.parseInt(tab[0]), list_positions);
-				}
-			}
-			else{
-				System.err.println("Erreur dans la lecture du fichier -" + fileName + "- : "
-						+ " la ligne tab_token n'est pas presente");
-				System.exit(0);
-			}
-			
-			
-			return true;
-		} catch (Exception e) {
-			System.out.println(e.toString());
-			return false;
-		}
-		*/
+		 * try { BufferedReader br = new BufferedReader(new InputStreamReader(
+		 * new FileInputStream(fileName), "UTF8"));
+		 * 
+		 * String ligne; String[] tab;
+		 * 
+		 * // Lecture de la structure corpus if((ligne = br.readLine()) != null
+		 * && ligne.equals("corpus")){ while ((ligne = br.readLine()) != null &&
+		 * !ligne.equals("dictionnaire")) { corpus.add(Integer.parseInt(ligne));
+		 * } } else{ System.err.println("Erreur dans la lecture du fichier -" +
+		 * fileName + "- : " + " la ligne corpus n'est pas presente");
+		 * System.exit(0); }
+		 * 
+		 * // Lecture de la structure dictionnaire if((ligne = br.readLine()) !=
+		 * null && ligne.equals("dictionnaire")){ while ((ligne = br.readLine())
+		 * != null && !ligne.equals("tab_token")) { tab = ligne.split(" ");
+		 * dictionnaire.put(tab[0], Integer.parseInt(tab[1])); } } else{
+		 * System.err.println("Erreur dans la lecture du fichier -" + fileName +
+		 * "- : " + " la ligne dictionnaire n'est pas presente");
+		 * System.exit(0); }
+		 * 
+		 * if((ligne = br.readLine()) != null && ligne.equals("tab_token")){
+		 * while ((ligne = br.readLine()) != null) { tab = ligne.split(" "); int
+		 * l = tab.length; ArrayList<Integer> list_positions = new
+		 * ArrayList<Integer>(); for(int i=1; i<l; i++){
+		 * list_positions.add(Integer.parseInt(tab[i])); }
+		 * tab_token.put(Integer.parseInt(tab[0]), list_positions); } } else{
+		 * System.err.println("Erreur dans la lecture du fichier -" + fileName +
+		 * "- : " + " la ligne tab_token n'est pas presente"); System.exit(0); }
+		 * 
+		 * 
+		 * return true; } catch (Exception e) {
+		 * System.out.println(e.toString()); return false; }
+		 */
 	}
-	
+
 	/**
 	 * permet de savoir si il y a le fichier qui contient les structures
+	 * 
 	 * @param fileName
 	 * @return true si un tel fichier existe, false sinon
 	 */
-	public boolean isWritenInFile(String fileName){
+	public boolean isWritenInFile(String fileName) {
 		File f = new File(fileName);
 		return f.exists();
 	}
-	
+
 	/**
 	 * 
 	 * @param phrase
 	 * @return
+	 * @throws TokenNotFoundException 
 	 */
-	public ArrayList<Integer> getEncodedPhrase(String phrase) {
-		String[] tokens= tokenize(phrase);
+	public ArrayList<Integer> getEncodedPhrase(String phrase) throws TokenNotFoundException {
+		String[] tokens = tokenize(phrase);
 		ArrayList<Integer> resultat = new ArrayList<>();
 		for (int i = 0; i < tokens.length; i++) {
-			resultat.add(dictionnaire.get(tokens[i]));	
+			if (dictionnaire.get(tokens[i]) != null) {
+				resultat.add(dictionnaire.get(tokens[i].toLowerCase()));
+			} else {
+				throw new TokenNotFoundException(tokens[i]);
+			}
 		}
+		
 		return resultat;
 	}
 
@@ -655,79 +611,84 @@ public class MonolingualCorpus implements Serializable{
 		/**
 		 * Test de getTokenAtPosition
 		 */
-		/*int position = 0; // A CHANGER EN FONCTION DU FICHIER
-		System.out.println("Test de getTokenAtPosition a la position "
-				+ position);
-		System.out.println("---> " + test.getTokenAtPosition(position));
-		System.out.println("Test de getSuffixFromPosition a la position "
-				+ position);
-		System.out.println("---> " + test.getSuffixFromPosition(position));
-
-		/**
-		 * Test de getSuffixFromPosition
+		/*
+		 * int position = 0; // A CHANGER EN FONCTION DU FICHIER
+		 * System.out.println("Test de getTokenAtPosition a la position " +
+		 * position); System.out.println("---> " +
+		 * test.getTokenAtPosition(position));
+		 * System.out.println("Test de getSuffixFromPosition a la position " +
+		 * position); System.out.println("---> " +
+		 * test.getSuffixFromPosition(position));
 		 * 
+		 * /** Test de getSuffixFromPosition
 		 */
 		int position = 4; // A CHANGER EN FONCTION DU FICHIER
 		System.out.println("Test de getTokenAtPosition a la position "
 				+ position);
 		System.out.println("---> " + test.getTokenAtPosition(position));
-		
+
 		System.out.println("Test de getSuffixFromPosition a la position "
 				+ position);
 		System.out.println("---> " + test.getSuffixFromPosition(position));
-		
 
 		/**
 		 * Test de getPhraseFromPosition
 		 */
-		/*position = 3; // A CHANGER EN FONCTION DU FICHIER
-		System.out.println("Test de getPhraseFromPosition a la position "
-				+ position);
-		System.out.println("---> " + test.getPhraseFromPosition(position));
-		*/
-		
+		/*
+		 * position = 3; // A CHANGER EN FONCTION DU FICHIER
+		 * System.out.println("Test de getPhraseFromPosition a la position " +
+		 * position); System.out.println("---> " +
+		 * test.getPhraseFromPosition(position));
+		 */
+
 		System.out.println("---------Dictionnaire------------");
 		for (Entry<String, Integer> entry : test.getDictionnaire().entrySet()) {
 			System.out.println("(" + entry.getKey() + ", " + entry.getValue()
 					+ ")");
 		}
 		System.out.println("---------------------------------");
-		
+
+		System.out.println("------- DEB TOKENS ---------");
 		System.out.println(test.getTab_token());
+		System.out.println("------- FIN TOKENS ---------");
+		
 		SuffixArray test1 = new SuffixArray(test);
 
+		System.out.println("------ DEB Recherche -------");
+		System.out.println(test1.getAllPositionsOfPhrase("Je"));
+		System.out.println("------ Fin Recherche -------");
+		
 		/**
 		 * Test de compareSuffixes
 		 */
 
 		/**
 		 * Affichage du dictionnaire
-		 
-		 
-		System.out.println("---------Dictionnaire------------");
-		for (Entry<String, Integer> entry : test.getDictionnaire().entrySet()) {
-			System.out.println("(" + entry.getKey() + ", " + entry.getValue()
-					+ ")");
-		}
-		System.out.println("---------------------------------");
-		*/
+		 * 
+		 * 
+		 * System.out.println("---------Dictionnaire------------"); for
+		 * (Entry<String, Integer> entry : test.getDictionnaire().entrySet()) {
+		 * System.out.println("(" + entry.getKey() + ", " + entry.getValue() +
+		 * ")"); } System.out.println("---------------------------------");
+		 */
 
 		/**
 		 * Affichage de tab_token
 		 * 
-		 
-		 System.out.println("-----------Tab_token------------");
-		 for(Entry<Integer, ArrayList<Integer>> entry2 : test.getTab_token().entrySet()){
-			 System.out.println("(" + entry2.getKey() + ", " + entry2.getValue().toString()
-					 + ")"); 
-		 } 
-		 System.out.println("--------------------------------");
+		 * 
+		 * System.out.println("-----------Tab_token------------");
+		 * for(Entry<Integer, ArrayList<Integer>> entry2 :
+		 * test.getTab_token().entrySet()){ System.out.println("(" +
+		 * entry2.getKey() + ", " + entry2.getValue().toString() + ")"); }
+		 * System.out.println("--------------------------------");
+		 */
+
+		/*
+		 * System.out.println(test.getCorpus()); SuffixArray suffixArray = new
+		 * SuffixArray(test);
 		 */
 		
-		 /*
-		System.out.println(test.getCorpus());
-		SuffixArray suffixArray = new SuffixArray(test);
-		*/
+		
 	}
 
 	public ArrayList<Integer> getCorpus() {
@@ -737,5 +698,5 @@ public class MonolingualCorpus implements Serializable{
 	public void setCorpus(ArrayList<Integer> corpus) {
 		this.corpus = corpus;
 	}
-	
+
 }
