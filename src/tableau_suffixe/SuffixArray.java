@@ -143,6 +143,37 @@ public class SuffixArray {
 		
 	}
 	
+	public static int rechercheDichotomique(ArrayList<Integer> suffixArray, int valeur){
+		int size = suffixArray.size();
+		int debut = 0;
+		int fin = size-1;
+		int milieu = (fin-debut)/2;
+		// il faut que fin - debut soit >= 2
+		while(milieu >= 1){
+			// valeur est dans la partie de droite
+			if(valeur > suffixArray.get(milieu)){
+				debut = milieu;
+			}
+			// valeur est dans la partie de gauche
+			else if(valeur < suffixArray.get(milieu)){
+				fin = milieu;
+			}
+			// valeur a ete trouvee
+			else{
+				// test pour etre sur
+				if(valeur == suffixArray.get(milieu)){
+					return milieu;	// milieu est la position ou se trouve valeur
+				}
+				else{
+					System.err.println("Erreur : on croit avoir trouvé... mais non");
+					return -1;
+				}
+			}
+			milieu = debut + (fin-debut)/2;
+		}
+		return -1;
+	}
+	
 	
 	ArrayList<Integer> getAllPositionsOfPhrase(String phrase) {
 		Set<Integer> resultat = new HashSet<Integer>();
@@ -181,6 +212,14 @@ public class SuffixArray {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public static void main(String[] args){
+		ArrayList<Integer> tab = new ArrayList<Integer>();
+		for(int i=0; i<10; i++){
+			tab.add(i+2);
+		}
+		System.out.println("recherche dicho = " + SuffixArray.rechercheDichotomique(tab, 10));
 	}
 	
 }
