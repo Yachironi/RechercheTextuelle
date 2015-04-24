@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
 
 public class SuffixArray {
 	private MonolingualCorpus corpus;
@@ -134,11 +136,32 @@ public class SuffixArray {
 	 * e.printStackTrace(); return null; } }
 	 */
 
+	
+	
+	int dichotomie(ArrayList<Integer>suffixArray, String phrase){
+		return 0;
+		
+	}
+	
+	
 	ArrayList<Integer> getAllPositionsOfPhrase(String phrase) {
 		Set<Integer> resultat = new HashSet<Integer>();
 		try {
 			ArrayList<Integer> encodedString = corpus.getEncodedPhrase(phrase
 					.toLowerCase());
+			/* On vérifie que tous les tokens appartiennent au dictionnaire
+			 * Si ce n'est pas le cas, on peut sortir
+			 */
+			
+			for(int i=0; i<encodedString.size();i++)
+			{
+				if(!corpus.getDictionnaire().containsValue(encodedString.get(0)))
+					return null;
+			}
+			
+			int first = dichotomie(suffixArray, phrase);
+			/* première occurence de phrase dans le tableau de suffixe */
+			resultat.add(suffixArray.get(first));
 
 			for (int i = 0; i < suffixArray.size(); i++) {
 				// System.out.println("Phrase["+i+"] = "+corpus.getSuffixFromPosition(i)+" | "+"Au revoir et à demain .");
@@ -159,4 +182,5 @@ public class SuffixArray {
 			return null;
 		}
 	}
+	
 }
