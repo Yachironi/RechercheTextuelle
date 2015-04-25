@@ -275,6 +275,39 @@ public class MonolingualCorpus implements Serializable {
 		else
 			return -1;
 	}
+	
+	/*
+	 * On ne trie non plus suivant l'ordre lexicographique, mais suivant la valeur 
+	 */
+	
+	public int compareSuffixesInt(int position1, int position2){
+
+		try {
+			String chaine1 = getSuffixFromPosition(position1);
+			String chaine2 = getSuffixFromPosition(position2);
+			if(position1==position2 || chaine1.equals(chaine2)) return 0;
+			ArrayList<Integer> encodedPosition1 = getEncodedPhrase(chaine1);
+			ArrayList<Integer> encodedPosition2 = getEncodedPhrase(chaine2);
+			int min = Math.min(encodedPosition1.size(), encodedPosition2.size());
+			for(int i=0;i<min;i++){
+				if(encodedPosition1.get(i) > encodedPosition2.get(i)) return 1;
+				else if (encodedPosition1.get(i) < encodedPosition2.get(i)) return -1;
+			}
+			
+			
+			if (encodedPosition1.size() > encodedPosition2.size())
+				return 1;
+			else
+				return -1;
+		
+		
+		} catch (TokenNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return -1;
+		
+	}
 
 	/**
 	 * Methodes auxiliaires
@@ -687,8 +720,11 @@ public class MonolingualCorpus implements Serializable {
 		 * System.out.println(test.getCorpus()); SuffixArray suffixArray = new
 		 * SuffixArray(test);
 		 */
-		
-		
+		ArrayList<Integer> coco = test1.getAllPositionsOfPhrase("un");
+		if(coco != null){
+			for(int i=0; i<coco.size();i++)
+				System.out.println(test.getSuffixFromPosition(coco.get(i)));
+		}
 	}
 
 	public ArrayList<Integer> getCorpus() {

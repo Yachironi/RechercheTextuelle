@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.util.CompareGenerator;
+
 
 public class SuffixArray {
 	private MonolingualCorpus corpus;
@@ -51,7 +53,8 @@ public class SuffixArray {
 		Comparator<Integer> comparator = new Comparator<Integer>() {
 			@Override
 			public int compare(Integer o1, Integer o2) {
-				return corpus.compareSuffixes(o1, o2);
+				//return corpus.compareSuffixes(o1, o2);
+				return corpus.compareSuffixesInt(o1, o2);
 			}
 		};
 		Collections.sort(suffixArray, comparator);
@@ -108,10 +111,7 @@ public class SuffixArray {
 		lcpArray.add(0);
 	}
 
-	int compareStringToSuffix(String phrase, Integer suffixPosition) {
 
-		return suffixPosition;
-	}
 
 	/*
 	 * ArrayList<Integer> getAllPositionsOfPhrase(String phrase) {
@@ -138,45 +138,56 @@ public class SuffixArray {
 
 	
 	
-	int dichotomie(ArrayList<Integer>suffixArray, String phrase){
-		return 0;
-		
-	}
-	
-	public static int rechercheDichotomique(ArrayList<Integer> suffixArray, int valeur){
+	public ArrayList<Integer> rechercheDichotomique(String phrase ){
 		int size = suffixArray.size();
 		int debut = 0;
-		int fin = size-1;
+		int fin = size;
 		int milieu = (fin-debut)/2;
+		ArrayList<Integer> resultat = new ArrayList<Integer>();
+		/*Dans le cas ou tableau de suffixe serai en fonction de la valeur, et non pas en fonction
+		 * de l'order lexicographique
+		 */
+		ArrayList<Integer> encodedPhrase = new ArrayList<Integer>();
+		try {
+			encodedPhrase = corpus.getEncodedPhrase(phrase.toLowerCase());
+		} catch (TokenNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		int val;
 		// il faut que fin - debut soit >= 2
-		while(milieu >= 1){
+		while(milieu >= 0){ // A VERIFIER AVEC JUJU
 			// valeur est dans la partie de droite
-			if(valeur > suffixArray.get(milieu)){
+		    //val = compareStringToSuffixe(suffixArray.get(milieu), phrase);
+			val = compareToSuffix(milieu, encodedPhrase);
+			
+			if(val >0){
 				debut = milieu;
 			}
 			// valeur est dans la partie de gauche
-			else if(valeur < suffixArray.get(milieu)){
+			else if(val < 0){
 				fin = milieu;
+				int m = debut + (fin-debut)/2;
 			}
 			// valeur a ete trouvee
-			else{
-				// test pour etre sur
-				if(valeur == suffixArray.get(milieu)){
-					return milieu;	// milieu est la position ou se trouve valeur
-				}
-				else{
-					System.err.println("Erreur : on croit avoir trouv�... mais non");
-					return -1;
-				}
+			else {
+				while(lcpArray.get(milieu)>=phrase.split(" ").length) 
+					{
+					resultat.add(milieu);
+					milieu--;	
+					}
+				resultat.add(milieu);
+				return resultat;	// milieu est la position ou se trouve valeur
 			}
 			milieu = debut + (fin-debut)/2;
 		}
-		return -1;
+		
+		return null;
 	}
 	
 	
 	ArrayList<Integer> getAllPositionsOfPhrase(String phrase) {
-		Set<Integer> resultat = new HashSet<Integer>();
+		ArrayList<Integer> resultat = new ArrayList<Integer>();
 		try {
 			ArrayList<Integer> encodedString = corpus.getEncodedPhrase(phrase
 					.toLowerCase());
@@ -189,37 +200,59 @@ public class SuffixArray {
 				if(!corpus.getDictionnaire().containsValue(encodedString.get(0)))
 					return null;
 			}
-			
-			int first = dichotomie(suffixArray, phrase);
-			/* première occurence de phrase dans le tableau de suffixe */
-			resultat.add(suffixArray.get(first));
-
-			for (int i = 0; i < suffixArray.size(); i++) {
-				// System.out.println("Phrase["+i+"] = "+corpus.getSuffixFromPosition(i)+" | "+"Au revoir et à demain .");
-
-				if (corpus.getEncodedPhrase(corpus.getSuffixFromPosition(i))
-						.containsAll(encodedString)) {
-					// System.out.println("trouvé");
-					// System.out.println(corpus.getPhraseFromPosition(i));
-					
-					
-					// TODO Ajouter le numéro de la ligne ou on trouve le token au lieu de la position dans la tablea du suffix
-					resultat.add(i);
-				}
+			resultat = rechercheDichotomique(phrase);
+			if(resultat == null){
+				return null;
 			}
-			return new ArrayList<>(resultat);
+			else{
+			
+			int tmp = resultat.get(0)+1;
+			System.out.println("Val"+resultat.get(0));
+			while(lcpArray.get(tmp)>=phrase.split(" ").length){
+				resultat.add(tmp);
+				tmp++;
+			}
+			ArrayList<Integer> finale = new ArrayList<Integer>();
+			for(int i=0;i<resultat.size();i++){
+				finale.add(suffixArray.get(resultat.get(i)));
+			}
+				return finale;
+			}	
+				
 		} catch (TokenNotFoundException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
-	
-	public static void main(String[] args){
-		ArrayList<Integer> tab = new ArrayList<Integer>();
-		for(int i=0; i<10; i++){
-			tab.add(i+2);
+	/*
+	 * Dans le cas ou le tableau de suffixe sera trier suivant la valeur
+	 */
+	int compareToSuffix(int position, ArrayList<Integer> phrase){
+		/* En mode int */ 
+		try {
+			ArrayList<Integer> encodedSuffix = corpus.getEncodedPhrase(corpus.getSuffixFromPosition(suffixArray.get(position)));
+			
+			int min = Math.min(phrase.size(), encodedSuffix.size());
+			for(int i=0;i<min;i++)
+			{
+				if(phrase.get(i)>encodedSuffix.get(i)) return 1;
+				if(phrase.get(i)<encodedSuffix.get(i)) return -1; 
+			}
+			return 0;
+		} catch (TokenNotFoundException e) {
+			e.printStackTrace();
 		}
-		System.out.println("recherche dicho = " + SuffixArray.rechercheDichotomique(tab, 10));
+		return 0;
 	}
 	
+	int compareStringToSuffixe(int position, String phrase){
+		String suffixe = corpus.getSuffixFromPosition(position);
+		
+		int min = Math.min(suffixe.length(),phrase.length());
+		for(int i=0; i<min;i++){
+			if(phrase.charAt(i) > suffixe.charAt(i)) return 1;
+			if (phrase.charAt(i) < suffixe.charAt(i)) return -1;
+		}
+		return 0;
+	}
 }
