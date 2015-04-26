@@ -87,8 +87,7 @@ public class MonolingualCorpus implements Serializable {
 
 		// Cas ou il n'existe pas de fichier contenant les structures
 		else {
-			System.out
-					.println("Ce fichier n'a pas deja ete serialize : ECRITURE");
+			System.out.println("Ce fichier n'a pas deja ete serialize : ECRITURE");
 			// Chargement du corpus
 			if (!loadFromFile(fileName, langue)) {
 				System.err.println("Erreur dans le chargement du fichier -"
