@@ -1,6 +1,8 @@
 package traducteur;
 
-public class CoupleInt {
+import java.io.Serializable;
+
+public class CoupleInt implements Serializable{
 	private int i1;
 	private int i2;
 	

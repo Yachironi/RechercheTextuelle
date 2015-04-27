@@ -58,25 +58,30 @@ public class SuffixArray {
 			}
 		};
 		Collections.sort(suffixArray, comparator);
-
-		System.out.println("------- DEB SuffixArray -------");
-		for (int i = 0; i < suffixArray.size(); i++)
-			System.out
-					.println(corpus.getSuffixFromPosition(suffixArray.get(i)));
-		System.out.println("------- FIN SuffixArray -------");
-
 		try {
 			setLcp();
 		} catch (TokenNotFoundException e) {
 			e.printStackTrace();
 		}
+		
+		System.out.println("TAILLLLLLLEEEE");
+		System.out.println(suffixArray.size());
+		System.out.println(lcpArray.size());
+		
+		System.out.println("------- DEB SuffixArray -------");
+		for (int i = 0; i < suffixArray.size(); i++)
+		{	System.out
+					.println(corpus.getSuffixFromPosition(suffixArray.get(i)));
+		System.out.println(lcpArray.get(i));
+		}
+		System.out.println("------- FIN SuffixArray -------");
+
+		
 		/*
 		 * for(int i=0;i<lcpArray.size();i++){
 		 * System.out.println(lcpArray.get(i)); }
 		 */
-		System.out.println("------- DEB LCP --------");
-		System.out.println(lcpArray);
-		System.out.println("------- FIN LCP --------");
+		
 
 	}
 
@@ -89,8 +94,9 @@ public class SuffixArray {
 	}
 
 	public void setLcp() throws TokenNotFoundException {
-		lcpArray = new ArrayList<Integer>(suffixArray.size() + 1);
+		lcpArray = new ArrayList<Integer>();
 		lcpArray.add(0);
+		System.out.println(" SUFFFIIIIIIIXEEEEEEEEE "+suffixArray.size());
 		for (int i = 1; i < suffixArray.size(); i++) {
 			int tmp = 0;
 			ArrayList<Integer> encodedString1 = corpus.getEncodedPhrase(corpus
@@ -100,13 +106,12 @@ public class SuffixArray {
 
 			int min = Math.min(encodedString1.size(), encodedString2.size());
 			for (int j = 0; j < min; j++) {
-				if (encodedString1.get(j) == encodedString2.get(j)) {
-					tmp++;
-				} else {
-					lcpArray.add(tmp);
+				if (encodedString1.get(j) != encodedString2.get(j)) {
 					break;
 				}
+				tmp++;
 			}
+			lcpArray.add(tmp);
 		}
 		lcpArray.add(0);
 	}
@@ -186,7 +191,7 @@ public class SuffixArray {
 	}
 	
 	
-	ArrayList<Integer> getAllPositionsOfPhrase(String phrase) {
+	public ArrayList<Integer> getAllPositionsOfPhrase(String phrase) {
 		ArrayList<Integer> resultat = new ArrayList<Integer>();
 		try {
 			ArrayList<Integer> encodedString = corpus.getEncodedPhrase(phrase
@@ -207,16 +212,17 @@ public class SuffixArray {
 			else{
 			
 			int tmp = resultat.get(0)+1;
-			System.out.println("Val"+resultat.get(0));
 			while(lcpArray.get(tmp)>=phrase.split(" ").length){
 				resultat.add(tmp);
 				tmp++;
 			}
-			ArrayList<Integer> finale = new ArrayList<Integer>();
+			Set<Integer> finale = new HashSet<Integer>();
 			for(int i=0;i<resultat.size();i++){
-				finale.add(suffixArray.get(resultat.get(i)));
+				//finale.add();
+				int val  = corpus.getDebutPhrase(suffixArray.get(resultat.get(i)));
+				finale.add(corpus.getTab_line().get_i2((val)));
 			}
-				return finale;
+			 return new ArrayList<>(finale);
 			}	
 				
 		} catch (TokenNotFoundException e) {

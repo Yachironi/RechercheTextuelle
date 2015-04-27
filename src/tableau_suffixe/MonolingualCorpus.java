@@ -20,6 +20,9 @@ import java.util.Map.Entry;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
+import traducteur.CoupleInt;
+import traducteur.ListCoupleInt;
+import traducteur.Traducteur;
 
 public class MonolingualCorpus implements Serializable {
 	/**
@@ -41,6 +44,7 @@ public class MonolingualCorpus implements Serializable {
 	// token
 	private HashMap<Integer, ArrayList<Integer>> tab_token;
 
+	private ListCoupleInt tab_line;
 	// Langue du corpus
 	private String langue;
 	private static int val_$$ = 0; // valeur numerique du caractere de fin
@@ -59,6 +63,7 @@ public class MonolingualCorpus implements Serializable {
 		dictionnaire = new HashMap<String, Integer>();
 		tab_token = new HashMap<Integer, ArrayList<Integer>>();
 		corpus = new ArrayList<Integer>();
+		tab_line = new ListCoupleInt();
 		try {
 			is = new FileInputStream("fr-token.bin");
 		} catch (FileNotFoundException e1) {
@@ -107,12 +112,17 @@ public class MonolingualCorpus implements Serializable {
 
 	public boolean loadFromFile(String fileName, String langue) {
 		try {
+			System.out.println("1--1");
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					new FileInputStream(fileName), "UTF8"));
+			System.out.println("1--2");
 			LineNumberReader lineNumberReader = new LineNumberReader(
 					new FileReader(fileName));
+			System.out.println("1--3");
 			lineNumberReader.skip(Long.MAX_VALUE);
+			System.out.println("1--4");
 			int lines = lineNumberReader.getLineNumber();
+			System.out.println("1--5");
 			String ligne, token;
 			String[] tab;
 			int val = val_$$ + 1; // valeur numerique des autres caracteres
@@ -127,6 +137,7 @@ public class MonolingualCorpus implements Serializable {
 			int parsedLines = 0;
 			// On parcours l'ensemble du corpus
 			while ((ligne = br.readLine()) != null) {
+				System.out.println("1--6");
 				// On parse la ligne en enlevant les espaces
 				tab = tokenize(ligne);
 				// On prend que les donnees de la langue choisie
@@ -140,7 +151,13 @@ public class MonolingualCorpus implements Serializable {
 					for (i = 2; i < tab.length; i++) {
 						// On transforme la chaine en minuscule
 						token = tab[i].toLowerCase();
+						
+						if(i==2)
+						{
+							tab_line.add(new CoupleInt(corpus.size(), id_ligne));
 
+						}
+						
 						// On ajoute le token au dictionnaire s'il n'y ait pas
 						if (!dictionnaire.containsKey(token)) {
 							dictionnaire.put(token, val);
@@ -351,7 +368,7 @@ public class MonolingualCorpus implements Serializable {
 	 * @param position
 	 * @return
 	 */
-	private int getDebutPhrase(int position) {
+	public int getDebutPhrase(int position) {
 		// Message d'erreur si position est incorrecte
 		if (position >= corpus.size()) {
 			System.err.println("La position n'est pas dans le corpus");
@@ -386,6 +403,7 @@ public class MonolingualCorpus implements Serializable {
 			oos.writeObject(corpus);
 			oos.writeObject(dictionnaire);
 			oos.writeObject(tab_token);
+			oos.writeObject(tab_line);
 			oos.writeInt(val_$$);
 
 			// Fermeture flux
@@ -468,7 +486,10 @@ public class MonolingualCorpus implements Serializable {
 			corpus = (ArrayList<Integer>) ois.readObject();
 			dictionnaire = (HashMap<String, Integer>) ois.readObject();
 			tab_token = (HashMap<Integer, ArrayList<Integer>>) ois.readObject();
+			tab_line = (ListCoupleInt) ois.readObject();
 			val_$$ = ois.readInt();
+		
+			
 
 			// Fermeture du flux
 			ois.close();
@@ -636,7 +657,7 @@ public class MonolingualCorpus implements Serializable {
 	 * Main pour tester cette classe AVEC LES DONNEES DE TATOEBA UNIQUEMENT
 	 */
 	public static void main(String[] args) {
-		String fileName = "Files/sentences.csv"; // A CHANGER AVANT DE TESTER
+		String fileName = "Files/test-1.csv"; // A CHANGER AVANT DE TESTER
 		MonolingualCorpus test = new MonolingualCorpus(fileName, "fra");
 		// Si on arrive jusqu'ici, c'est que le load n'a pas g�n�rer d'erreur
 
@@ -687,8 +708,16 @@ public class MonolingualCorpus implements Serializable {
 		SuffixArray test1 = new SuffixArray(test);
 
 		System.out.println("------ DEB Recherche -------");
-		System.out.println(test1.getAllPositionsOfPhrase("Je"));
+		System.out.println(test1.getAllPositionsOfPhrase("suis"));
 		System.out.println("------ Fin Recherche -------");
+		
+		System.out.println("------ line -------");
+		//System.out.println(test.tab_line);
+		System.out.println("------ Fin line -------");
+		
+		//Traducteur test = new Traducteur(lang1, lang2, corpus, link)
+		
+		
 		
 		/**
 		 * Test de compareSuffixes
@@ -719,11 +748,15 @@ public class MonolingualCorpus implements Serializable {
 		 * System.out.println(test.getCorpus()); SuffixArray suffixArray = new
 		 * SuffixArray(test);
 		 */
-		ArrayList<Integer> coco = test1.getAllPositionsOfPhrase("un");
-		if(coco != null){
-			for(int i=0; i<coco.size();i++)
-				System.out.println(test.getSuffixFromPosition(coco.get(i)));
-		}
+		
+	}
+
+	public ListCoupleInt getTab_line() {
+		return tab_line;
+	}
+
+	public void setTab_line(ListCoupleInt tab_line) {
+		this.tab_line = tab_line;
 	}
 
 	public ArrayList<Integer> getCorpus() {

@@ -168,7 +168,7 @@ public class Traducteur {
 		// Cas ou on veut traduire de suffixArray_lang1 -> suffixArray_lang2
 		if(suffixArray_lang1.getCorpus().getLangue().equals(lang1) && 
 				suffixArray_lang2.getCorpus().getLangue().equals(lang2)){
-			list_IdPhrases = suffixArray_lang1.rechercheDichotomique(phrase);
+			list_IdPhrases = suffixArray_lang1.getAllPositionsOfPhrase(phrase);
 
 			int pos_traduit;
 			// On effectue la traduction
@@ -183,8 +183,14 @@ public class Traducteur {
 			 * TODO : on doit chercher dans suffixArray_lang2 les 
 			 * phrases dont les id sont dans list_IdPhrases_traduit
 			 */
-
-			
+			int position_corpus;
+			String phraseAtPosi;
+			for(Integer pos : list_IdPhrases)
+			{
+				 //position_corpus = suffixArray_lang2.getCorpus().getTab_line().get_i1(pos);
+				 //phraseAtPosi = suffixArray_lang2.getCorpus().getSuffixFromPosition(position_corpus);
+				 //resultat_traduction.add(phraseAtPosi);
+			}			
 		}
 		
 		// Cas ou on veut traduire de suffixArray_lang2 -> suffixArray_lang1
@@ -205,6 +211,15 @@ public class Traducteur {
 			 * TODO : on doit chercher dans suffixArray_lang1 les 
 			 * phrases dont les id sont dans list_IdPhrases_traduit
 			 */
+			int position_corpus;
+			String phraseAtPosi;
+			for(Integer pos : list_IdPhrases)
+			{
+				// position_corpus = suffixArray_lang1.getCorpus().getTab_line().get_i1(pos);
+			//	 phraseAtPosi = suffixArray_lang1.getCorpus().getSuffixFromPosition(position_corpus);
+				// resultat_traduction.add(phraseAtPosi);
+			}			
+			
 		}
 		// Probleme
 		else{
