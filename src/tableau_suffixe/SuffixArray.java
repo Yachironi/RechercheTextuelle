@@ -186,7 +186,7 @@ public class SuffixArray {
 	}
 	
 	
-	ArrayList<Integer> getAllPositionsOfPhrase(String phrase) {
+	public ArrayList<Integer> getAllPositionsOfPhrase(String phrase) {
 		ArrayList<Integer> resultat = new ArrayList<Integer>();
 		try {
 			ArrayList<Integer> encodedString = corpus.getEncodedPhrase(phrase
@@ -227,7 +227,7 @@ public class SuffixArray {
 	/*
 	 * Dans le cas ou le tableau de suffixe sera trier suivant la valeur
 	 */
-	int compareToSuffix(int position, ArrayList<Integer> phrase){
+	public int compareToSuffix(int position, ArrayList<Integer> phrase){
 		/* En mode int */ 
 		try {
 			ArrayList<Integer> encodedSuffix = corpus.getEncodedPhrase(corpus.getSuffixFromPosition(suffixArray.get(position)));
@@ -245,7 +245,7 @@ public class SuffixArray {
 		return 0;
 	}
 	
-	int compareStringToSuffixe(int position, String phrase){
+	public int compareStringToSuffixe(int position, String phrase){
 		String suffixe = corpus.getSuffixFromPosition(position);
 		
 		int min = Math.min(suffixe.length(),phrase.length());

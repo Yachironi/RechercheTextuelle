@@ -636,7 +636,7 @@ public class MonolingualCorpus implements Serializable {
 	 * Main pour tester cette classe AVEC LES DONNEES DE TATOEBA UNIQUEMENT
 	 */
 	public static void main(String[] args) {
-		String fileName = "Files/sentences.csv"; // A CHANGER AVANT DE TESTER
+		String fileName = "Files/test.csv"; // A CHANGER AVANT DE TESTER
 		MonolingualCorpus test = new MonolingualCorpus(fileName, "fra");
 		// Si on arrive jusqu'ici, c'est que le load n'a pas g�n�rer d'erreur
 
@@ -719,7 +719,10 @@ public class MonolingualCorpus implements Serializable {
 		 * System.out.println(test.getCorpus()); SuffixArray suffixArray = new
 		 * SuffixArray(test);
 		 */
-		ArrayList<Integer> coco = test1.getAllPositionsOfPhrase("un");
+		
+		String phrase = "pomme";
+		ArrayList<Integer> coco = test1.getAllPositionsOfPhrase(phrase);
+		System.out.println("------------------- " + phrase + " ----------------------");
 		if(coco != null){
 			for(int i=0; i<coco.size();i++)
 				System.out.println(test.getSuffixFromPosition(coco.get(i)));
