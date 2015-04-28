@@ -27,4 +27,9 @@ public class CoupleInt implements Serializable{
 		this.i2 = i2;
 	}
 
+	@Override
+	public String toString() {
+		return "(" + i1  + ", " + i2 + ")";
+	}
+
 }

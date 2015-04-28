@@ -1,10 +1,12 @@
 package traducteur;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
@@ -57,6 +59,94 @@ public class Traducteur {
 						+ "le fichier -" + read_write_link + "-");
 				System.exit(0);
 			}
+		}
+	}
+	
+	/**
+	 * Ecrit dans un fichier les phrases des 2 corpus en parallele
+	 * @param fileLang1
+	 * @param fileLang2
+	 * @return
+	 */
+	/**
+	 * TODO : verifier s'il faut faire newLine + flush
+	 */
+	public boolean writePhrasesInParallel(String fileLang1, String fileLang2){
+		try {
+			BufferedWriter bw_lang1 = new BufferedWriter(new FileWriter(fileLang1));
+			BufferedWriter bw_lang2 = new BufferedWriter(new FileWriter(fileLang2));
+			
+			int id_ligne;
+			String phrase;
+			
+			boolean res = true;
+			for(CoupleInt c : link){
+				// On s'occupe de la phrase du 1er int
+				id_ligne = c.getI1();
+				phrase = suffixArray_lang1.getCorpus().getPhraseFromLine(id_ligne);
+				// cas ou la ligne est presente dans le corpus lang1
+				if(phrase != null){
+					bw_lang1.write(phrase);
+					bw_lang1.newLine();
+					bw_lang1.flush();
+					
+					// on s'occupe de la phrase du 2eme int : elle devrait
+					// appartenir au corpus lang2
+					id_ligne = c.getI2();
+					phrase = suffixArray_lang2.getCorpus().getPhraseFromLine(id_ligne);
+					if(phrase != null){
+						bw_lang2.write(phrase);
+						bw_lang2.newLine();
+						bw_lang2.flush();
+					}
+					else{
+						System.err.println("Erreur au niveau du CoupleInt " + c + " car la phrase "
+								+ c.getI2() + " n'appartient pas au corpus "
+										+ suffixArray_lang2.getCorpus().getLangue());
+						res = false;
+					}
+				}
+				else{
+					phrase = suffixArray_lang2.getCorpus().getPhraseFromLine(id_ligne);
+					// cas ou la ligne est presente dans le corpus lang2
+					if(phrase != null){
+						bw_lang2.write(phrase);
+						bw_lang2.newLine();
+						bw_lang2.flush();
+						
+						// on s'occupe de la phrase du 2eme int : elle devrait
+						// appartenir au corpus lang1
+						id_ligne = c.getI2();
+						phrase = suffixArray_lang1.getCorpus().getPhraseFromLine(id_ligne);
+						if(phrase != null){
+							bw_lang1.write(phrase);
+							bw_lang1.newLine();
+							bw_lang1.flush();
+						}
+						else{
+							System.err.println("Erreur au niveau du CoupleInt " + c + " car la phrase "
+									+ c.getI2() + " n'appartient pas au corpus "
+											+ suffixArray_lang1.getCorpus().getLangue());
+							res = false;
+						}
+					}
+					// Erreur : la ligne n'appartient a aucun des corpus
+					else{
+						System.err.println("Erreur au niveau du CoupleInt " + c + " car la phrase "
+								+ c.getI1() + " n'appartient a aucun corpus");
+						res = false;
+					}
+				}
+				
+			}
+		  
+		 	bw_lang1.close();
+		 	bw_lang2.close();
+		 	return res;
+		} 
+		catch (IOException e) {
+			e.printStackTrace();
+			return false;
 		}
 	}
 		

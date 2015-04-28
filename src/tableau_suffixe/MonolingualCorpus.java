@@ -263,6 +263,21 @@ public class MonolingualCorpus implements Serializable {
 		}
 		return suffixe.substring(0, suffixe.length() - 1);
 	}
+	
+	/**
+	 * Permet de recuperer la phrase present a la ligne passee en parametre
+	 * @param ligne
+	 * @return
+	 */
+	public String getPhraseFromLine(int ligne){
+		int position = tab_line.get_i1(ligne);
+		if(position != -1){
+			return getPhraseFromPosition(position);
+		}
+		else{
+			return null;
+		}
+	}
 
 	/**
 	 * 
