@@ -20,6 +20,9 @@ import java.util.Map.Entry;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
+import traducteur.CoupleInt;
+import traducteur.ListCoupleInt;
+import traducteur.Traducteur;
 
 public class MonolingualCorpus implements Serializable {
 	/**
@@ -41,6 +44,8 @@ public class MonolingualCorpus implements Serializable {
 	// token
 	private HashMap<Integer, ArrayList<Integer>> tab_token;
 
+	private ListCoupleInt tab_line;
+	
 	// Langue du corpus
 	private String langue;
 	private static int val_$$ = 0; // valeur numerique du caractere de fin
@@ -59,6 +64,11 @@ public class MonolingualCorpus implements Serializable {
 		dictionnaire = new HashMap<String, Integer>();
 		tab_token = new HashMap<Integer, ArrayList<Integer>>();
 		corpus = new ArrayList<Integer>();
+		tab_line = new ListCoupleInt();
+		
+		/*
+		 * Initialisation des attributs de tokenization
+		 */
 		try {
 			is = new FileInputStream("fr-token.bin");
 		} catch (FileNotFoundException e1) {
@@ -73,6 +83,12 @@ public class MonolingualCorpus implements Serializable {
 			e.printStackTrace();
 		}
 		tokenizer = new TokenizerME(model);
+		/*
+		 * Fin de l'initialisation des attributs de tokenization
+		 */
+		
+		
+		
 		// Cas ou il existe un fichier contenant les structures
 		if (isWritenInFile(fileName_structure)) {
 			System.out.println("Ce fichier a deja ete serialize : LECTURE");
@@ -107,40 +123,35 @@ public class MonolingualCorpus implements Serializable {
 
 	public boolean loadFromFile(String fileName, String langue) {
 		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					new FileInputStream(fileName), "UTF8"));
-			LineNumberReader lineNumberReader = new LineNumberReader(
-					new FileReader(fileName));
-			lineNumberReader.skip(Long.MAX_VALUE);
-			int lines = lineNumberReader.getLineNumber();
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF8"));
 			String ligne, token;
 			String[] tab;
 			int val = val_$$ + 1; // valeur numerique des autres caracteres
 			int i, id_ligne, val_token;
 
-			// Mise en place de la tokenisation
-
-			// Ajout du caractere $$ dans le dictionnaire. On lui associe la
-			// valeur 0
+			// Ajout du caractere de fin de paragraphe dans le dico
 			dictionnaire.put("$$", val_$$);
 
-			int parsedLines = 0;
-			// On parcours l'ensemble du corpus
 			while ((ligne = br.readLine()) != null) {
-				// On parse la ligne en enlevant les espaces
 				tab = tokenize(ligne);
+				
 				// On prend que les donnees de la langue choisie
-				parsedLines++;
 				if (tab[1].equals(langue)) {
 					id_ligne = Integer.parseInt(tab[0]);
 
 					// On lit le tableau parse (on commence a i=2 car on prend
-					// pas le int
-					// et la langue
+					// pas le int et la langue
 					for (i = 2; i < tab.length; i++) {
 						// On transforme la chaine en minuscule
 						token = tab[i].toLowerCase();
+						
+						// ajout du couple (position du 1er mot de la ligne, 
+						//	numero de la ligne)
+						if(i==2){
+							tab_line.add(new CoupleInt(corpus.size(), id_ligne));
 
+						}
+						
 						// On ajoute le token au dictionnaire s'il n'y ait pas
 						if (!dictionnaire.containsKey(token)) {
 							dictionnaire.put(token, val);
@@ -155,8 +166,6 @@ public class MonolingualCorpus implements Serializable {
 						}
 						// Cas ou tab_token ne contient pas la valeur du token
 						else {
-							// System.out.println("token = " + token +
-							// " ligne = " + id_ligne);
 							tab_token.put(val_token, new ArrayList<Integer>());
 							tab_token.get(val_token).add(id_ligne);
 						}
@@ -169,12 +178,12 @@ public class MonolingualCorpus implements Serializable {
 					corpus.add(val_$$);
 					if (tab_token.containsKey(val_$$)) {
 						tab_token.get(val_$$).add(id_ligne);
-					} else {
+					} 
+					else {
 						tab_token.put(val_$$, new ArrayList<Integer>());
 						tab_token.get(val_$$).add(id_ligne);
 					}
 				}
-				// System.out.println(parsedLines+" / "+lines);
 			}
 			is.close();
 			return true;
@@ -239,6 +248,12 @@ public class MonolingualCorpus implements Serializable {
 		return suffixe.substring(0, suffixe.length() - 1);
 	}
 
+	/**
+	 * Renvoie la phrase entiere auquel appartient le token present a la position
+	 * passee en parametre
+	 * @param position
+	 * @return
+	 */
 	public String getPhraseFromPosition(int position) {
 		int pos_debut_phrase = getDebutPhrase(position);
 		int pos_fin_phrase = getFinPhrase(position);
@@ -351,7 +366,7 @@ public class MonolingualCorpus implements Serializable {
 	 * @param position
 	 * @return
 	 */
-	private int getDebutPhrase(int position) {
+	public int getDebutPhrase(int position) {
 		// Message d'erreur si position est incorrecte
 		if (position >= corpus.size()) {
 			System.err.println("La position n'est pas dans le corpus");
@@ -382,10 +397,11 @@ public class MonolingualCorpus implements Serializable {
 			ObjectOutputStream oos = new ObjectOutputStream(
 					new FileOutputStream(f));
 
-			// s�rialization de l'objet
+			// sï¿½rialization de l'objet
 			oos.writeObject(corpus);
 			oos.writeObject(dictionnaire);
 			oos.writeObject(tab_token);
+			oos.writeObject(tab_line);
 			oos.writeInt(val_$$);
 
 			// Fermeture flux
@@ -413,7 +429,7 @@ public class MonolingualCorpus implements Serializable {
 		 * output.flush(); //ensuite flush envoie dans le fichier, ne pas
 		 * oublier cette methode pour le BufferedWriter
 		 * 
-		 * output.close(); //et on le ferme System.out.println("fichier cr��");
+		 * output.close(); //et on le ferme System.out.println("fichier crï¿½ï¿½");
 		 * } catch(IOException ioe){ System.out.print("Erreur : ");
 		 * ioe.printStackTrace(); }
 		 * 
@@ -423,7 +439,7 @@ public class MonolingualCorpus implements Serializable {
 		/*
 		 * 
 		 * FileWriter writer = null; String texte =
-		 * "texte � ins�rer � la fin du fichier"; try{ writer = new
+		 * "texte ï¿½ insï¿½rer ï¿½ la fin du fichier"; try{ writer = new
 		 * FileWriter("fichier.txt", true);
 		 * writer.write(texte,0,texte.length()); }catch(IOException ex){
 		 * ex.printStackTrace(); }finally{ if(writer != null){ try {
@@ -468,7 +484,10 @@ public class MonolingualCorpus implements Serializable {
 			corpus = (ArrayList<Integer>) ois.readObject();
 			dictionnaire = (HashMap<String, Integer>) ois.readObject();
 			tab_token = (HashMap<Integer, ArrayList<Integer>>) ois.readObject();
+			tab_line = (ListCoupleInt) ois.readObject();
 			val_$$ = ois.readInt();
+		
+			
 
 			// Fermeture du flux
 			ois.close();
@@ -539,7 +558,8 @@ public class MonolingualCorpus implements Serializable {
 		for (int i = 0; i < tokens.length; i++) {
 			if (dictionnaire.get(tokens[i]) != null) {
 				resultat.add(dictionnaire.get(tokens[i].toLowerCase()));
-			} else {
+			} 
+			else {
 				throw new TokenNotFoundException(tokens[i]);
 			}
 		}
@@ -551,9 +571,9 @@ public class MonolingualCorpus implements Serializable {
 	 * 
 	 * @param ligne
 	 * @param tab
-	 *            Permet d'enlever des caract�res de ponctuation eventuellement
+	 *            Permet d'enlever des caractï¿½res de ponctuation eventuellement
 	 *            present
-	 * @return un string, la "vraie" ligne, sans l'integer et la langue au d�but
+	 * @return un string, la "vraie" ligne, sans l'integer et la langue au dï¿½but
 	 *         de la ligne
 	 */
 	private String reelleLigne(String ligne, String[] tab) {
@@ -575,7 +595,7 @@ public class MonolingualCorpus implements Serializable {
 			i++;
 			j++;
 		}
-		// Si c'est vrai, alors c'�tait bien la langue
+		// Si c'est vrai, alors c'ï¿½tait bien la langue
 		if (j == size_lang) {
 			// On enleve les espaces
 			while (i < size && ligne.charAt(i) == ' ') {
@@ -589,7 +609,7 @@ public class MonolingualCorpus implements Serializable {
 	}
 
 	/**
-	 * Permet d'enlever des caract�res de ponctuation eventuellement present a
+	 * Permet d'enlever des caractï¿½res de ponctuation eventuellement present a
 	 * la fin du token
 	 * 
 	 * @param token
@@ -637,58 +657,25 @@ public class MonolingualCorpus implements Serializable {
 	 */
 	public static void main(String[] args) {
 		String fileName = "Files/test.csv"; // A CHANGER AVANT DE TESTER
-		MonolingualCorpus test = new MonolingualCorpus(fileName, "fra");
-		// Si on arrive jusqu'ici, c'est que le load n'a pas g�n�rer d'erreur
-
-		/**
-		 * Test de getTokenAtPosition
-		 */
-		/*
-		 * int position = 0; // A CHANGER EN FONCTION DU FICHIER
-		 * System.out.println("Test de getTokenAtPosition a la position " +
-		 * position); System.out.println("---> " +
-		 * test.getTokenAtPosition(position));
-		 * System.out.println("Test de getSuffixFromPosition a la position " +
-		 * position); System.out.println("---> " +
-		 * test.getSuffixFromPosition(position));
-		 * 
-		 * /** Test de getSuffixFromPosition
-		 */
-		int position = 4; // A CHANGER EN FONCTION DU FICHIER
-		System.out.println("Test de getTokenAtPosition a la position "
-				+ position);
-		System.out.println("---> " + test.getTokenAtPosition(position));
-
-		System.out.println("Test de getSuffixFromPosition a la position "
-				+ position);
-		System.out.println("---> " + test.getSuffixFromPosition(position));
-
-		/**
-		 * Test de getPhraseFromPosition
-		 */
-		/*
-		 * position = 3; // A CHANGER EN FONCTION DU FICHIER
-		 * System.out.println("Test de getPhraseFromPosition a la position " +
-		 * position); System.out.println("---> " +
-		 * test.getPhraseFromPosition(position));
-		 */
-
-		System.out.println("---------Dictionnaire------------");
-		for (Entry<String, Integer> entry : test.getDictionnaire().entrySet()) {
-			System.out.println("(" + entry.getKey() + ", " + entry.getValue()
-					+ ")");
-		}
-		System.out.println("---------------------------------");
-
-		System.out.println("------- DEB TOKENS ---------");
-		System.out.println(test.getTab_token());
-		System.out.println("------- FIN TOKENS ---------");
 		
-		SuffixArray test1 = new SuffixArray(test);
+		SuffixArray test1 = new SuffixArray(fileName, "fra");
+		
+		int t=1;
+		if(t == 1){
+			return;
+		}
 
 		System.out.println("------ DEB Recherche -------");
-		System.out.println(test1.getAllPositionsOfPhrase("Je"));
+		System.out.println(test1.getAllPositionsOfPhrase("suis"));
 		System.out.println("------ Fin Recherche -------");
+		
+		System.out.println("------ line -------");
+		//System.out.println(test.tab_line);
+		System.out.println("------ Fin line -------");
+		
+		//Traducteur test = new Traducteur(lang1, lang2, corpus, link)
+		
+		
 		
 		/**
 		 * Test de compareSuffixes
@@ -720,6 +707,7 @@ public class MonolingualCorpus implements Serializable {
 		 * SuffixArray(test);
 		 */
 		
+		/*
 		String phrase = "pomme";
 		ArrayList<Integer> coco = test1.getAllPositionsOfPhrase(phrase);
 		System.out.println("------------------- " + phrase + " ----------------------");
@@ -727,6 +715,16 @@ public class MonolingualCorpus implements Serializable {
 			for(int i=0; i<coco.size();i++)
 				System.out.println(test.getSuffixFromPosition(coco.get(i)));
 		}
+		
+		*/
+	}
+
+	public ListCoupleInt getTab_line() {
+		return tab_line;
+	}
+
+	public void setTab_line(ListCoupleInt tab_line) {
+		this.tab_line = tab_line;
 	}
 
 	public ArrayList<Integer> getCorpus() {
@@ -735,6 +733,10 @@ public class MonolingualCorpus implements Serializable {
 
 	public void setCorpus(ArrayList<Integer> corpus) {
 		this.corpus = corpus;
+	}
+	
+	public int getValFinParagraphe(){
+		return val_$$;
 	}
 
 }

@@ -23,8 +23,8 @@ public class Traducteur {
 	private ListCoupleInt link;
 	
 	public Traducteur(String lang1, String lang2, String corpus, String link){
-		suffixArray_lang1 = new SuffixArray(new MonolingualCorpus(corpus, lang1));		
-		suffixArray_lang2 = new SuffixArray(new MonolingualCorpus(corpus, lang2));
+		suffixArray_lang1 = new SuffixArray(corpus, lang1);		
+		suffixArray_lang2 = new SuffixArray(corpus, lang2);
 		
 		String fileName_link = "";
 		initLink(fileName_link, link);
@@ -59,7 +59,7 @@ public class Traducteur {
 			}
 		}
 	}
-	
+		
 	/**
 	 * Ecrit la hashmap dans un fichier
 	 * @param fileName
@@ -183,8 +183,14 @@ public class Traducteur {
 			 * TODO : on doit chercher dans suffixArray_lang2 les 
 			 * phrases dont les id sont dans list_IdPhrases_traduit
 			 */
-
-			
+			int position_corpus;
+			String phraseAtPosi;
+			for(Integer pos : list_IdPhrases)
+			{
+				 //position_corpus = suffixArray_lang2.getCorpus().getTab_line().get_i1(pos);
+				 //phraseAtPosi = suffixArray_lang2.getCorpus().getSuffixFromPosition(position_corpus);
+				 //resultat_traduction.add(phraseAtPosi);
+			}			
 		}
 		
 		// Cas ou on veut traduire de suffixArray_lang2 -> suffixArray_lang1
@@ -205,6 +211,15 @@ public class Traducteur {
 			 * TODO : on doit chercher dans suffixArray_lang1 les 
 			 * phrases dont les id sont dans list_IdPhrases_traduit
 			 */
+			int position_corpus;
+			String phraseAtPosi;
+			for(Integer pos : list_IdPhrases)
+			{
+				// position_corpus = suffixArray_lang1.getCorpus().getTab_line().get_i1(pos);
+			//	 phraseAtPosi = suffixArray_lang1.getCorpus().getSuffixFromPosition(position_corpus);
+				// resultat_traduction.add(phraseAtPosi);
+			}			
+			
 		}
 		// Probleme
 		else{
