@@ -74,4 +74,19 @@ public class ListCoupleInt extends ArrayList<CoupleInt>{
 		}
 		return false;
 	}
+	
+	public boolean contains_couple(CoupleInt val){
+		for(CoupleInt c : this){
+			System.out.println(c.getI1());
+			System.out.println(c.getI2());
+			System.out.println("------------");
+			System.out.println(val.getI1());
+			System.out.println(val.getI2());
+			System.out.println("----------------");
+			if(val.getI1() == c.getI1() && val.getI2() == c.getI2()){
+				return true;
+			}
+		}
+		return false;
+	}
 }

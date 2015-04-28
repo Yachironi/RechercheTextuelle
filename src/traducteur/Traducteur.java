@@ -28,8 +28,9 @@ public class Traducteur {
 		suffixArray_lang1 = new SuffixArray(corpus, lang1);		
 		suffixArray_lang2 = new SuffixArray(corpus, lang2);
 		
-		String fileName_link = "";
+		String fileName_link = "coco";
 		initLink(fileName_link, link);
+		System.out.println(this.link);
 	}
 
 	/**
@@ -50,6 +51,7 @@ public class Traducteur {
 		}
 		// Ecriture
 		else{
+			System.out.println("je suis la");
 			if(!loadLink(load_link)){
 				System.err.println("Erreur dans le chargement du fichier -" + load_link + "-");
 				System.exit(0);
@@ -183,6 +185,7 @@ public class Traducteur {
 	 */
 	private boolean loadLink(String fileName) {
 		try {
+			System.out.println("on load");
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					new FileInputStream(fileName), "UTF8"));
 			String ligne;
@@ -191,17 +194,21 @@ public class Traducteur {
 			while ((ligne = br.readLine()) != null) {
 				// On parse la ligne en enlevant les espaces
 				tab = ligne.split(" ");
-				
+				int line1 = Integer.parseInt(tab[0]);
+				int line2 = Integer.parseInt(tab[1]);
 				// Condition pour ajouter le couple d'entier : il faut que les phrases liees
 				// appartiennent aux 2 corpus
-				if((suffixArray_lang1.getCorpus().getTab_token().containsKey(tab[0])
-						&& suffixArray_lang2.getCorpus().getTab_token().containsKey(tab[1]))
-						||
-				   (suffixArray_lang2.getCorpus().getTab_token().containsKey(tab[0]) 
-						&& suffixArray_lang1.getCorpus().getTab_token().containsKey(tab[1]))){
-					link.add(new CoupleInt(Integer.parseInt(tab[0]), Integer.parseInt(tab[0])));
+				if(!link.contains_couple(new CoupleInt(line1, line2)) && !link.contains_couple(new CoupleInt(line2, line1)))
+					if((suffixArray_lang1.getCorpus().getTab_line().contains_i2(line1)
+							&& suffixArray_lang2.getCorpus().getTab_line().contains_i2(line2)
+							||
+					   (suffixArray_lang2.getCorpus().getTab_line().contains(line1)
+							&& suffixArray_lang1.getCorpus().getTab_line().contains(line2)))){
+		
+						link.add(new CoupleInt(line1, line2));	
+					}	
 				}
-			}
+			
 			return true;
 		} catch (Exception e) {
 			System.out.println(e.toString());
@@ -268,19 +275,22 @@ public class Traducteur {
 					list_IdPhrases_traduit.add(pos_traduit);	
 				}
 			}
-			
+			System.out.println(list_IdPhrases_traduit);
 			/**
 			 * TODO : on doit chercher dans suffixArray_lang2 les 
 			 * phrases dont les id sont dans list_IdPhrases_traduit
 			 */
 			int position_corpus;
 			String phraseAtPosi;
-			for(Integer pos : list_IdPhrases)
+			for(Integer pos : list_IdPhrases_traduit)
 			{
-				 //position_corpus = suffixArray_lang2.getCorpus().getTab_line().get_i1(pos);
-				 //phraseAtPosi = suffixArray_lang2.getCorpus().getSuffixFromPosition(position_corpus);
-				 //resultat_traduction.add(phraseAtPosi);
-			}			
+				 System.out.println(pos);
+				 position_corpus = suffixArray_lang2.getCorpus().getTab_line().get_i1(pos);
+				 System.out.println(position_corpus);
+				 phraseAtPosi = suffixArray_lang2.getCorpus().getSuffixFromPosition(position_corpus);
+				 resultat_traduction.add(phraseAtPosi);
+			}
+			return resultat_traduction;
 		}
 		
 		// Cas ou on veut traduire de suffixArray_lang2 -> suffixArray_lang1
@@ -303,12 +313,13 @@ public class Traducteur {
 			 */
 			int position_corpus;
 			String phraseAtPosi;
-			for(Integer pos : list_IdPhrases)
+			for(Integer pos : list_IdPhrases_traduit)
 			{
-				// position_corpus = suffixArray_lang1.getCorpus().getTab_line().get_i1(pos);
-			//	 phraseAtPosi = suffixArray_lang1.getCorpus().getSuffixFromPosition(position_corpus);
-				// resultat_traduction.add(phraseAtPosi);
-			}			
+				 position_corpus = suffixArray_lang1.getCorpus().getTab_line().get_i1(pos);
+				 phraseAtPosi = suffixArray_lang1.getCorpus().getSuffixFromPosition(position_corpus);
+				 resultat_traduction.add(phraseAtPosi);
+			}	
+			return resultat_traduction;
 			
 		}
 		// Probleme
@@ -346,5 +357,11 @@ public class Traducteur {
 
 	public void setLink(ListCoupleInt link) {
 		this.link = link;
+	}
+	
+	public static void main(String[] args) {
+		Traducteur test = new Traducteur("fra","eng","Files/test-2.csv","Files/link.csv");
+		test.writePhrasesInParallel("Files/testFr.txt","Files/testEng.txt");
+		System.out.println(test.traduct("je", "fra", "eng"));
 	}
 }
