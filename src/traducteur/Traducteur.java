@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -12,6 +13,7 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,6 +27,12 @@ public class Traducteur {
 	//private HashMap<Integer, Integer> link;
 	private ListCoupleInt link;
 	
+	// Correspondances de la langue 1 vers la langue 2
+	private ArrayList<ListCoupleInt> listCorrespondances_lang12;
+	
+	// Correspondances de la langue 2 vers la langue 1
+	private ArrayList<ListCoupleInt> listCorrespondances_lang21;
+	
 	public Traducteur(String lang1, String lang2, String corpus, String link){
 		suffixArray_lang1 = new SuffixArray(corpus, lang1);		
 		suffixArray_lang2 = new SuffixArray(corpus, lang2);
@@ -32,6 +40,10 @@ public class Traducteur {
 		String fileName_link = "coco";
 		initLink(fileName_link, link);
 		System.out.println(this.link);
+		String fileName_correspondance_12 = "";	// TODO
+		String fileName_correspondance_21 = "";	// TODO
+		listCorrespondances_lang12 = loadCorrespondances(fileName_correspondance_12);
+		listCorrespondances_lang21 = loadCorrespondances(fileName_correspondance_21);
 	}
 
 	/**
@@ -333,6 +345,34 @@ public class Traducteur {
 	}
 	
 	
+	public ArrayList<ListCoupleInt> loadCorrespondances(String fileName){
+		ArrayList<ListCoupleInt> list = new ArrayList<ListCoupleInt>();
+
+		try {
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF8"));
+			String ligne;
+			String[] tab;
+			ListCoupleInt list_ligne = new ListCoupleInt();
+
+			while ((ligne = br.readLine()) != null) {
+				list_ligne = new ListCoupleInt();
+				tab = ligne.split("[ -]");
+				int i;
+				int size = tab.length;
+				for(i=0; i<size; i+=2){
+					list_ligne.add(new CoupleInt(Integer.parseInt(tab[i]), Integer.parseInt(tab[i+1])));
+				}
+				list.add(list_ligne);
+			}
+		} 
+		catch (NumberFormatException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return list;
+	}
+		
+	
 	/**
 	 * Getter & Setter
 	 */
@@ -362,10 +402,41 @@ public class Traducteur {
 		this.link = link;
 	}
 	
+
+	public ArrayList<ListCoupleInt> getListCorrespondances_lang12() {
+		return listCorrespondances_lang12;
+	}
+
+	public void setListCorrespondances_lang12(
+			ArrayList<ListCoupleInt> listCorrespondances_lang12) {
+		this.listCorrespondances_lang12 = listCorrespondances_lang12;
+	}
+
+	public ArrayList<ListCoupleInt> getListCorrespondances_lang21() {
+		return listCorrespondances_lang21;
+	}
+
+	public void setListCorrespondances_lang21(
+			ArrayList<ListCoupleInt> listCorrespondances_lang21) {
+		this.listCorrespondances_lang21 = listCorrespondances_lang21;
+	}
+	
+	
+	
+	
+	
 	public static void main(String[] args) {
+		
 		Traducteur test = new Traducteur("fra","eng","Files/test-2.csv","Files/link.csv");
 		test.writePhrasesInParallel("Files/testFr.txt","Files/testEng.txt");
 		System.out.println(test.traduct("je", "fra", "eng"));
 		
+		
+		/*
+		ArrayList<ListCoupleInt> list = Traducteur.loadCorrespondances("Files/correspondance_test.txt");
+		for(ListCoupleInt l : list){
+			System.out.println(l);
+		}
+		*/
 	}
 }
