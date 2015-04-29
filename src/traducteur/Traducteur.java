@@ -13,6 +13,7 @@ import java.io.LineNumberReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import tableau_suffixe.MonolingualCorpus;
@@ -290,6 +291,8 @@ public class Traducteur {
 				 phraseAtPosi = suffixArray_lang2.getCorpus().getSuffixFromPosition(position_corpus);
 				 resultat_traduction.add(phraseAtPosi);
 			}
+			// On trie de la plus pertinente a la moins pertinente
+			Collections.sort(resultat_traduction, new ComparatorResultTraduction());
 			return resultat_traduction;
 		}
 		
@@ -363,5 +366,6 @@ public class Traducteur {
 		Traducteur test = new Traducteur("fra","eng","Files/test-2.csv","Files/link.csv");
 		test.writePhrasesInParallel("Files/testFr.txt","Files/testEng.txt");
 		System.out.println(test.traduct("je", "fra", "eng"));
+		
 	}
 }
