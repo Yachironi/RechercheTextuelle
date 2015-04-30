@@ -20,6 +20,9 @@ import java.util.HashMap;
 
 import tableau_suffixe.MonolingualCorpus;
 import tableau_suffixe.SuffixArray;
+import traducteur.ComparatorResultTraduction;
+import traducteur.CoupleInt;
+import traducteur.ListCoupleInt;
 
 public class Traducteur {
 	private SuffixArray suffixArray_lang1;	// fr
@@ -452,10 +455,11 @@ public class Traducteur {
 	
 	public static void main(String[] args) {
 		
+	
 		Traducteur test = new Traducteur("fra","eng","Files/test-2.csv","Files/link.csv");
 		test.writePhrasesInParallel("Files/testFr.txt","Files/testEng.txt");
 		System.out.println(test.traduct("je", "fra", "eng"));
-		
+	
 		
 		/*
 		ArrayList<ListCoupleInt> list = Traducteur.loadCorrespondances("Files/correspondance_test.txt");

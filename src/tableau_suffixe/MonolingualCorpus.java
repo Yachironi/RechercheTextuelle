@@ -3,13 +3,9 @@ package tableau_suffixe;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -17,12 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import opennlp.tools.tokenize.Tokenizer;
-import opennlp.tools.tokenize.TokenizerME;
-import opennlp.tools.tokenize.TokenizerModel;
 import traducteur.CoupleInt;
 import traducteur.ListCoupleInt;
-import traducteur.Traducteur;
 
 public class MonolingualCorpus implements Serializable {
 	/**
@@ -46,6 +38,8 @@ public class MonolingualCorpus implements Serializable {
 
 	private ListCoupleInt tab_line;
 	
+	private HashMap<Integer, String> listPhrasesReelles;	// va nous permettre d'afficher les vraies phrases
+	
 	// Langue du corpus
 	private String langue;
 	private static int val_$$ = 0; // valeur numerique du caractere de fin
@@ -56,26 +50,18 @@ public class MonolingualCorpus implements Serializable {
 	 * Constructeur
 	 **/
 	public MonolingualCorpus(String fileName, String langue) {
-		fileName_structure = fileName + "_" + "structures_" + langue + ".txt";
+		fileName_structure = fileName + "_" + "structures_" + langue;
 		this.setLangue(langue);
 		dictionnaire = new HashMap<String, Integer>();
 		tab_token = new HashMap<Integer, ArrayList<Integer>>();
 		corpus = new ArrayList<Integer>();
 		tab_line = new ListCoupleInt();
-		
-		/*
-		 * Initialisation des attributs de tokenization
-		 */
-		
-		/*
-		 * Fin de l'initialisation des attributs de tokenization
-		 */
-		
-		
+		listPhrasesReelles = new HashMap<Integer, String>();
 		
 		// Cas ou il existe un fichier contenant les structures
 		if (isWritenInFile(fileName_structure)) {
 			System.out.println("Ce fichier a deja ete serialize : LECTURE");
+			System.out.println("debut read");
 			// Lecture
 			if (!readStructuresInFile(fileName_structure)) {
 				System.err
@@ -83,17 +69,20 @@ public class MonolingualCorpus implements Serializable {
 								+ "le fichier -" + fileName_structure + "-");
 				System.exit(0);
 			}
+			System.out.println("fin read");
 		}
 
 		// Cas ou il n'existe pas de fichier contenant les structures
 		else {
 			System.out.println("Ce fichier n'a pas deja ete serialize : ECRITURE");
+			System.out.println("Debut load");
 			// Chargement du corpus
 			if (!loadFromFile(fileName, langue)) {
 				System.err.println("Erreur dans le chargement du fichier -"
 						+ fileName + "-");
 				System.exit(0);
 			}
+			System.out.println("Fin load\nDebut write");
 			// Ecriture des structures
 			if (!writeStructuresInFile(fileName_structure)) {
 				System.err
@@ -101,9 +90,11 @@ public class MonolingualCorpus implements Serializable {
 								+ "le fichier -" + fileName_structure + "-");
 				System.exit(0);
 			}
+			System.out.println("Fin write");
 		}
 
 	}
+
 
 	public boolean loadFromFile(String fileName, String langue) {
 		try {
@@ -117,11 +108,16 @@ public class MonolingualCorpus implements Serializable {
 			dictionnaire.put("$$", val_$$);
 
 			while ((ligne = br.readLine()) != null) {
+				
 				tab = tokenize(ligne);
+				//id_ligne = Integer.parseInt(tab[0]);
 				
 				// On prend que les donnees de la langue choisie
-				if (tab[1].equals(langue)) {
+				if (tab.length>1 && tab[1].equals(langue)) {
 					id_ligne = Integer.parseInt(tab[0]);
+					// on ajoute la phrase reelle
+					//listPhrasesReelles.put(id_ligne, reelleLigne(ligne, tab));
+					listPhrasesReelles.put(id_ligne, reelleLigne(ligne, tab));
 
 					// On lit le tableau parse (on commence a i=2 car on prend
 					// pas le int et la langue
@@ -171,6 +167,9 @@ public class MonolingualCorpus implements Serializable {
 			}
 			return true;
 		} catch (Exception e) {
+			
+			System.out.println(getPhraseFromPosition(corpus.size()-2));
+			
 			System.out.println(e.toString());
 			return false;
 		}
@@ -401,7 +400,8 @@ public class MonolingualCorpus implements Serializable {
 			oos.writeObject(tab_token);
 			oos.writeObject(tab_line);
 			oos.writeInt(val_$$);
-
+			oos.writeObject(listPhrasesReelles);
+			
 			// Fermeture flux
 			oos.close();
 			return true;
@@ -411,60 +411,6 @@ public class MonolingualCorpus implements Serializable {
 			e.printStackTrace();
 			return false;
 		}
-		/*
-		 * try{
-		 * 
-		 * FileWriter fw = new FileWriter(adressedufichier, true);
-		 * 
-		 * // le BufferedWriter output auquel on donne comme argument le
-		 * FileWriter fw cree juste au dessus BufferedWriter output = new
-		 * BufferedWriter(fw);
-		 * 
-		 * //on marque dans le fichier ou plutot dans le BufferedWriter qui sert
-		 * comme un tampon(stream) output.write(texte); //on peut utiliser
-		 * plusieurs fois methode write
-		 * 
-		 * output.flush(); //ensuite flush envoie dans le fichier, ne pas
-		 * oublier cette methode pour le BufferedWriter
-		 * 
-		 * output.close(); //et on le ferme System.out.println("fichier crï¿½ï¿½");
-		 * } catch(IOException ioe){ System.out.print("Erreur : ");
-		 * ioe.printStackTrace(); }
-		 * 
-		 * }
-		 */
-
-		/*
-		 * 
-		 * FileWriter writer = null; String texte =
-		 * "texte ï¿½ insï¿½rer ï¿½ la fin du fichier"; try{ writer = new
-		 * FileWriter("fichier.txt", true);
-		 * writer.write(texte,0,texte.length()); }catch(IOException ex){
-		 * ex.printStackTrace(); }finally{ if(writer != null){ try {
-		 * writer.close(); } catch (IOException e) { // TODO Auto-generated
-		 * catch block e.printStackTrace(); } } }
-		 */
-
-		/*
-		 * 
-		 * try { FileWriter f = new FileWriter("Files/structures.txt");
-		 * PrintWriter pw = new PrintWriter(f);
-		 * 
-		 * // Ecriture du corpus pw.println("corpus"); for(Integer i : corpus){
-		 * pw.println(i.toString()); }
-		 * 
-		 * 
-		 * // Ecriture du dictionnaire pw.println("dictionnaire"); for
-		 * (Entry<String, Integer> entry : dictionnaire.entrySet()) {
-		 * pw.println(entry.getKey() + " " + entry.getValue().toString()); }
-		 * 
-		 * // Ecriture de tab_token pw.println("tab_token"); String chaine = "";
-		 * for (Entry<Integer, ArrayList<Integer>> entry2 :
-		 * tab_token.entrySet()) { chaine = entry2.getKey().toString();
-		 * for(Integer j : entry2.getValue()){ chaine = chaine + " " +
-		 * j.toString(); } pw.println(chaine); } pw.close(); return true; }
-		 * catch (IOException e) { return false; }
-		 */
 	}
 
 	/**
@@ -484,8 +430,7 @@ public class MonolingualCorpus implements Serializable {
 			tab_token = (HashMap<Integer, ArrayList<Integer>>) ois.readObject();
 			tab_line = (ListCoupleInt) ois.readObject();
 			val_$$ = ois.readInt();
-		
-			
+			listPhrasesReelles= (HashMap<Integer, String>) ois.readObject();
 
 			// Fermeture du flux
 			ois.close();
@@ -496,41 +441,6 @@ public class MonolingualCorpus implements Serializable {
 			e.printStackTrace();
 			return false;
 		}
-
-		/*
-		 * try { BufferedReader br = new BufferedReader(new InputStreamReader(
-		 * new FileInputStream(fileName), "UTF8"));
-		 * 
-		 * String ligne; String[] tab;
-		 * 
-		 * // Lecture de la structure corpus if((ligne = br.readLine()) != null
-		 * && ligne.equals("corpus")){ while ((ligne = br.readLine()) != null &&
-		 * !ligne.equals("dictionnaire")) { corpus.add(Integer.parseInt(ligne));
-		 * } } else{ System.err.println("Erreur dans la lecture du fichier -" +
-		 * fileName + "- : " + " la ligne corpus n'est pas presente");
-		 * System.exit(0); }
-		 * 
-		 * // Lecture de la structure dictionnaire if((ligne = br.readLine()) !=
-		 * null && ligne.equals("dictionnaire")){ while ((ligne = br.readLine())
-		 * != null && !ligne.equals("tab_token")) { tab = ligne.split(" ");
-		 * dictionnaire.put(tab[0], Integer.parseInt(tab[1])); } } else{
-		 * System.err.println("Erreur dans la lecture du fichier -" + fileName +
-		 * "- : " + " la ligne dictionnaire n'est pas presente");
-		 * System.exit(0); }
-		 * 
-		 * if((ligne = br.readLine()) != null && ligne.equals("tab_token")){
-		 * while ((ligne = br.readLine()) != null) { tab = ligne.split(" "); int
-		 * l = tab.length; ArrayList<Integer> list_positions = new
-		 * ArrayList<Integer>(); for(int i=1; i<l; i++){
-		 * list_positions.add(Integer.parseInt(tab[i])); }
-		 * tab_token.put(Integer.parseInt(tab[0]), list_positions); } } else{
-		 * System.err.println("Erreur dans la lecture du fichier -" + fileName +
-		 * "- : " + " la ligne tab_token n'est pas presente"); System.exit(0); }
-		 * 
-		 * 
-		 * return true; } catch (Exception e) {
-		 * System.out.println(e.toString()); return false; }
-		 */
 	}
 
 	/**
@@ -596,14 +506,23 @@ public class MonolingualCorpus implements Serializable {
 		// Si c'est vrai, alors c'ï¿½tait bien la langue
 		if (j == size_lang) {
 			// On enleve les espaces
-			while (i < size && ligne.charAt(i) == ' ') {
+			while (i < size && !isValidChar(ligne.charAt(i))) {
 				i++;
 			}
 			// Arrive ici, c'est le debut de la "vraie" ligne
 			return ligne.substring(i, size - 1);
 		}
 		// Si on arrive ici, c'est qu'il y a eu une erreur
+		System.err.println("Erreur dans reelleLigne");
 		return null;
+	}
+	
+	public boolean isValidChar(char c){
+		return (c>='a'&& c<='z') || (c>='A' && c<='Z') || (c>='0' && c<='9');
+	}
+	
+	public String getReellePhrase(int ligne){
+		return listPhrasesReelles.get(ligne);
 	}
 
 	/**
@@ -612,7 +531,7 @@ public class MonolingualCorpus implements Serializable {
 	 * 
 	 * @param token
 	 * @return string (token) sans la ponctuation a la fin du token "initial"
-	 */
+	 
 	private String enlevePonctuationEnFinDeToken(String token) {
 		char end = token.charAt(token.length() - 1);
 		if (!((end >= 'a' && end <= 'z') || (end >= '0' && end <= '9'))) {
@@ -621,6 +540,7 @@ public class MonolingualCorpus implements Serializable {
 		}
 		return token;
 	}
+	*/
 
 	/**
 	 * Get & Set
@@ -649,72 +569,7 @@ public class MonolingualCorpus implements Serializable {
 	public void setLangue(String langue) {
 		this.langue = langue;
 	}
-
-	/**
-	 * Main pour tester cette classe AVEC LES DONNEES DE TATOEBA UNIQUEMENT
-	 */
-	public static void main(String[] args) {
-		String fileName = "Files/test.csv"; // A CHANGER AVANT DE TESTER
-		
-		SuffixArray test1 = new SuffixArray(fileName, "fra");
-		
-		System.out.println("DICO");
-		
-		System.out.println(test1.getCorpus().getDictionnaire());
-		System.out.println("------ DEB Recherche -------");
-		System.out.println(test1.getAllPositionsOfPhrase("suis"));
-		System.out.println("------ Fin Recherche -------");
-		
-		System.out.println("------ line -------");
-		//System.out.println(test.tab_line);
-		System.out.println("------ Fin line -------");
-		
-		//Traducteur test = new Traducteur(lang1, lang2, corpus, link)
-		
-		
-		
-		/**
-		 * Test de compareSuffixes
-		 */
-
-		/**
-		 * Affichage du dictionnaire
-		 * 
-		 * 
-		 * System.out.println("---------Dictionnaire------------"); for
-		 * (Entry<String, Integer> entry : test.getDictionnaire().entrySet()) {
-		 * System.out.println("(" + entry.getKey() + ", " + entry.getValue() +
-		 * ")"); } System.out.println("---------------------------------");
-		 */
-
-		/**
-		 * Affichage de tab_token
-		 * 
-		 * 
-		 * System.out.println("-----------Tab_token------------");
-		 * for(Entry<Integer, ArrayList<Integer>> entry2 :
-		 * test.getTab_token().entrySet()){ System.out.println("(" +
-		 * entry2.getKey() + ", " + entry2.getValue().toString() + ")"); }
-		 * System.out.println("--------------------------------");
-		 */
-
-		/*
-		 * System.out.println(test.getCorpus()); SuffixArray suffixArray = new
-		 * SuffixArray(test);
-		 */
-		
-		/*
-		String phrase = "pomme";
-		ArrayList<Integer> coco = test1.getAllPositionsOfPhrase(phrase);
-		System.out.println("------------------- " + phrase + " ----------------------");
-		if(coco != null){
-			for(int i=0; i<coco.size();i++)
-				System.out.println(test.getSuffixFromPosition(coco.get(i)));
-		}
-		
-		*/
-	}
-
+	
 	public ListCoupleInt getTab_line() {
 		return tab_line;
 	}
@@ -734,5 +589,38 @@ public class MonolingualCorpus implements Serializable {
 	public int getValFinParagraphe(){
 		return val_$$;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public HashMap<Integer, String> getListPhrasesReelles() {
+		return listPhrasesReelles;
+	}
 
+
+	public void setListPhrasesReelles(HashMap<Integer, String> listPhrasesReelles) {
+		this.listPhrasesReelles = listPhrasesReelles;
+	}
+
+
+	/**
+	 * Main pour tester cette classe AVEC LES DONNEES DE TATOEBA UNIQUEMENT
+	 */
+	public static void main(String[] args) {
+		String fileName = "Files/sentences.csv"; // A CHANGER AVANT DE TESTER
+		
+		System.out.println("Lancement de MonolingualCorpus");
+		MonolingualCorpus mc = new MonolingualCorpus(fileName, "fra");
+		
+	}
+	
+	
 }
