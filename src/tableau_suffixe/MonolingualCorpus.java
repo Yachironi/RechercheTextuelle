@@ -658,7 +658,6 @@ public class MonolingualCorpus implements Serializable {
 		
 		SuffixArray test1 = new SuffixArray(fileName, "fra");
 		
-		
 		System.out.println("DICO");
 		
 		System.out.println(test1.getCorpus().getDictionnaire());
