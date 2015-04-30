@@ -77,16 +77,21 @@ public class ListCoupleInt extends ArrayList<CoupleInt>{
 	
 	public boolean contains_couple(CoupleInt val){
 		for(CoupleInt c : this){
-			System.out.println(c.getI1());
-			System.out.println(c.getI2());
-			System.out.println("------------");
-			System.out.println(val.getI1());
-			System.out.println(val.getI2());
-			System.out.println("----------------");
 			if(val.getI1() == c.getI1() && val.getI2() == c.getI2()){
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	public int getPosi(CoupleInt val){
+		int i=0;
+		for(CoupleInt c : this){
+			if( (val.getI1() == c.getI1() && val.getI2() == c.getI2()) || (val.getI1()==c.getI2() && val.getI2()==c.getI1())){
+				return i;
+			}
+			i++;
+		}
+		return -1;
 	}
 }

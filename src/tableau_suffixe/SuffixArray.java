@@ -59,13 +59,9 @@ public class SuffixArray {
 		};
 		
 		Collections.sort(suffixArray, comparator);
-		System.out.println("Apres tri de suffixArray\nAvant setLCP");
 		try {
-			System.out.println("Je suis dans try LCP");
 			setLcp();
-			System.out.println("LCP ok");
 		} catch (TokenNotFoundException e) {
-			System.out.println("Je rentre dans catch");
 			e.printStackTrace();
 		}
 		
@@ -103,7 +99,6 @@ public class SuffixArray {
 	public void setLcp() throws TokenNotFoundException {
 		lcpArray = new ArrayList<Integer>();
 		lcpArray.add(0);
-		System.out.println(" SUFFFIIIIIIIXEEEEEEEEE "+suffixArray.size());
 		for (int i = 1; i < suffixArray.size(); i++) {
 			int tmp = 0;
 			ArrayList<Integer> encodedString1 = corpus.getEncodedPhrase(corpus

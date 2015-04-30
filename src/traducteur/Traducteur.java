@@ -29,7 +29,7 @@ public class Traducteur {
 	private SuffixArray suffixArray_lang2;	// eng
 	//private HashMap<Integer, Integer> link;
 	private ListCoupleInt link;
-	
+	private HashMap<CoupleInt, Integer> position;
 	// Correspondances de la langue 1 vers la langue 2
 	private ArrayList<ListCoupleInt> listCorrespondances_lang12;
 	
@@ -67,7 +67,6 @@ public class Traducteur {
 		}
 		// Ecriture
 		else{
-			System.out.println("je suis la");
 			if(!loadLink(load_link)){
 				System.err.println("Erreur dans le chargement du fichier -" + load_link + "-");
 				System.exit(0);
@@ -207,6 +206,7 @@ public class Traducteur {
 			String ligne;
 			String[] tab;
 			// On parcours l'ensemble du fichier link
+			int i=0;
 			while ((ligne = br.readLine()) != null) {
 				// On parse la ligne en enlevant les espaces
 				tab = ligne.split(" ");
@@ -222,6 +222,8 @@ public class Traducteur {
 							&& suffixArray_lang1.getCorpus().getTab_line().contains(line2)))){
 		
 						link.add(new CoupleInt(line1, line2));	
+						position.put(new CoupleInt(line1, line2), i);
+						i++;
 					}	
 				}
 			
@@ -272,6 +274,7 @@ public class Traducteur {
 	public ArrayList<String> traduct(String phrase, String lang1, String lang2){
 		ArrayList<String> resultat_traduction = new ArrayList<String>();
 		
+		
 		// Contient les id des phrases de la recherche dans la langue initiale
 		ArrayList<Integer> list_IdPhrases;
 		
@@ -292,6 +295,20 @@ public class Traducteur {
 				}
 			}
 			System.out.println(list_IdPhrases_traduit);
+			
+			ArrayList<CoupleInt> concordance = new ArrayList<CoupleInt>();
+			
+			/*for(int i=0; i<list_IdPhrases.size();i++){
+				if(position.containsKey(new CoupleInt(list_IdPhrases.get(i), list_IdPhrases_traduit.get(i)))){
+					concordance.add(position.get(new CoupleInt(list_IdPhrases.get(i), list_IdPhrases_traduit.get(i))));
+				}
+			}
+			*/
+			
+			
+			
+			
+			
 			/**
 			 * TODO : on doit chercher dans suffixArray_lang2 les 
 			 * phrases dont les id sont dans list_IdPhrases_traduit
@@ -325,6 +342,14 @@ public class Traducteur {
 				}
 			}
 			
+			/*TODO : utiliser la nouvelleFonction getPosition */
+			/*ArrayList<Integer> concordance = new ArrayList<Integer>();
+			for(int i=0; i<list_IdPhrases.size();i++){
+				if(position.containsKey(new CoupleInt(list_IdPhrases.get(i), list_IdPhrases_traduit.get(i)))){
+					concordance.add(position.get(new CoupleInt(list_IdPhrases.get(i), list_IdPhrases_traduit.get(i))));
+				}
+			}
+			*/
 			/**
 			 * TODO : on doit chercher dans suffixArray_lang1 les 
 			 * phrases dont les id sont dans list_IdPhrases_traduit
