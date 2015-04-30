@@ -49,9 +49,6 @@ public class MonolingualCorpus implements Serializable {
 	// Langue du corpus
 	private String langue;
 	private static int val_$$ = 0; // valeur numerique du caractere de fin
-	private InputStream is;
-	private TokenizerModel model;
-	private Tokenizer tokenizer;
 
 	private String fileName_structure;
 
@@ -69,20 +66,7 @@ public class MonolingualCorpus implements Serializable {
 		/*
 		 * Initialisation des attributs de tokenization
 		 */
-		try {
-			is = new FileInputStream("fr-token.bin");
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		model = null;
-		try {
-			model = new TokenizerModel(is);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		tokenizer = new TokenizerME(model);
+		
 		/*
 		 * Fin de l'initialisation des attributs de tokenization
 		 */
@@ -185,7 +169,6 @@ public class MonolingualCorpus implements Serializable {
 					}
 				}
 			}
-			is.close();
 			return true;
 		} catch (Exception e) {
 			System.out.println(e.toString());
@@ -348,7 +331,7 @@ public class MonolingualCorpus implements Serializable {
 	 * @return
 	 */
 	public String[] tokenize(String chaine) {
-		return tokenizer.tokenize(chaine);
+		return chaine.split("\\W+");
 	}
 
 	/**
@@ -675,11 +658,10 @@ public class MonolingualCorpus implements Serializable {
 		
 		SuffixArray test1 = new SuffixArray(fileName, "fra");
 		
-		int t=1;
-		if(t == 1){
-			return;
-		}
-
+		
+		System.out.println("DICO");
+		
+		System.out.println(test1.getCorpus().getDictionnaire());
 		System.out.println("------ DEB Recherche -------");
 		System.out.println(test1.getAllPositionsOfPhrase("suis"));
 		System.out.println("------ Fin Recherche -------");
