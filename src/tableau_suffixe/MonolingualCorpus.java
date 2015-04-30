@@ -69,8 +69,13 @@ public class MonolingualCorpus implements Serializable {
 		/*
 		 * Initialisation des attributs de tokenization
 		 */
+		String fileBin = "";
+		if(langue.equals("fra")){
+			fileBin = "fr-token.bin";
+		}
+		
 		try {
-			is = new FileInputStream("fr-token.bin");
+			is = new FileInputStream(fileBin);
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -92,6 +97,7 @@ public class MonolingualCorpus implements Serializable {
 		// Cas ou il existe un fichier contenant les structures
 		if (isWritenInFile(fileName_structure)) {
 			System.out.println("Ce fichier a deja ete serialize : LECTURE");
+			System.out.println("debut read");
 			// Lecture
 			if (!readStructuresInFile(fileName_structure)) {
 				System.err
@@ -99,17 +105,20 @@ public class MonolingualCorpus implements Serializable {
 								+ "le fichier -" + fileName_structure + "-");
 				System.exit(0);
 			}
+			System.out.println("fin read");
 		}
 
 		// Cas ou il n'existe pas de fichier contenant les structures
 		else {
 			System.out.println("Ce fichier n'a pas deja ete serialize : ECRITURE");
+			System.out.println("Debut load");
 			// Chargement du corpus
 			if (!loadFromFile(fileName, langue)) {
 				System.err.println("Erreur dans le chargement du fichier -"
 						+ fileName + "-");
 				System.exit(0);
 			}
+			System.out.println("Fin load\nDebut write");
 			// Ecriture des structures
 			if (!writeStructuresInFile(fileName_structure)) {
 				System.err
@@ -117,6 +126,7 @@ public class MonolingualCorpus implements Serializable {
 								+ "le fichier -" + fileName_structure + "-");
 				System.exit(0);
 			}
+			System.out.println("Fin write");
 		}
 
 	}
@@ -667,72 +677,6 @@ public class MonolingualCorpus implements Serializable {
 		this.langue = langue;
 	}
 
-	/**
-	 * Main pour tester cette classe AVEC LES DONNEES DE TATOEBA UNIQUEMENT
-	 */
-	public static void main(String[] args) {
-		String fileName = "Files/test.csv"; // A CHANGER AVANT DE TESTER
-		
-		SuffixArray test1 = new SuffixArray(fileName, "fra");
-		
-		int t=1;
-		if(t == 1){
-			return;
-		}
-
-		System.out.println("------ DEB Recherche -------");
-		System.out.println(test1.getAllPositionsOfPhrase("suis"));
-		System.out.println("------ Fin Recherche -------");
-		
-		System.out.println("------ line -------");
-		//System.out.println(test.tab_line);
-		System.out.println("------ Fin line -------");
-		
-		//Traducteur test = new Traducteur(lang1, lang2, corpus, link)
-		
-		
-		
-		/**
-		 * Test de compareSuffixes
-		 */
-
-		/**
-		 * Affichage du dictionnaire
-		 * 
-		 * 
-		 * System.out.println("---------Dictionnaire------------"); for
-		 * (Entry<String, Integer> entry : test.getDictionnaire().entrySet()) {
-		 * System.out.println("(" + entry.getKey() + ", " + entry.getValue() +
-		 * ")"); } System.out.println("---------------------------------");
-		 */
-
-		/**
-		 * Affichage de tab_token
-		 * 
-		 * 
-		 * System.out.println("-----------Tab_token------------");
-		 * for(Entry<Integer, ArrayList<Integer>> entry2 :
-		 * test.getTab_token().entrySet()){ System.out.println("(" +
-		 * entry2.getKey() + ", " + entry2.getValue().toString() + ")"); }
-		 * System.out.println("--------------------------------");
-		 */
-
-		/*
-		 * System.out.println(test.getCorpus()); SuffixArray suffixArray = new
-		 * SuffixArray(test);
-		 */
-		
-		/*
-		String phrase = "pomme";
-		ArrayList<Integer> coco = test1.getAllPositionsOfPhrase(phrase);
-		System.out.println("------------------- " + phrase + " ----------------------");
-		if(coco != null){
-			for(int i=0; i<coco.size();i++)
-				System.out.println(test.getSuffixFromPosition(coco.get(i)));
-		}
-		
-		*/
-	}
 
 	public ListCoupleInt getTab_line() {
 		return tab_line;
@@ -754,4 +698,33 @@ public class MonolingualCorpus implements Serializable {
 		return val_$$;
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * Main pour tester cette classe AVEC LES DONNEES DE TATOEBA UNIQUEMENT
+	 */
+	public static void main(String[] args) {
+		String fileName = "Files/sentences.csv"; // A CHANGER AVANT DE TESTER
+		
+		System.out.println("Lancement de MonolingualCorpus");
+		MonolingualCorpus mc = new MonolingualCorpus(fileName, "fra");
+		
+		
+	}
+	
+	
 }
