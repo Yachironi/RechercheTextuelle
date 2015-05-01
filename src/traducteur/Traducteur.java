@@ -20,6 +20,8 @@ import java.util.HashMap;
 
 import tableau_suffixe.MonolingualCorpus;
 import tableau_suffixe.SuffixArray;
+
+ 
 import traducteur.ComparatorResultTraduction;
 import traducteur.CoupleInt;
 import traducteur.ListCoupleInt;
@@ -460,6 +462,7 @@ public class Traducteur {
 		test.writePhrasesInParallel("Files/testFr.txt","Files/testEng.txt");
 		System.out.println(test.traduct("je", "fra", "eng"));
 	
+ 
 		
 		/*
 		ArrayList<ListCoupleInt> list = Traducteur.loadCorrespondances("Files/correspondance_test.txt");

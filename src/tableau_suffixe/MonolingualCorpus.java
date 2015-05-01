@@ -478,9 +478,9 @@ public class MonolingualCorpus implements Serializable {
 	 * 
 	 * @param ligne
 	 * @param tab
-	 *            Permet d'enlever des caractï¿½res de ponctuation eventuellement
+	 *            Permet d'enlever des caracteres de ponctuation eventuellement
 	 *            present
-	 * @return un string, la "vraie" ligne, sans l'integer et la langue au dï¿½but
+	 * @return un string, la "vraie" ligne, sans l'integer et la langue au debut
 	 *         de la ligne
 	 */
 	private String reelleLigne(String ligne, String[] tab) {
@@ -525,7 +525,7 @@ public class MonolingualCorpus implements Serializable {
 	}
 
 	/**
-	 * Permet d'enlever des caractï¿½res de ponctuation eventuellement present a
+	 * Permet d'enlever des caracteres de ponctuation eventuellement present a
 	 * la fin du token
 	 * 
 	 * @param token
