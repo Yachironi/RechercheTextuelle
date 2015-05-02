@@ -2,7 +2,7 @@ package grapheLexical;
 
 import java.util.ArrayList;
 
-import nlp.smt.tools.Pair;
+//import nlp.smt.tools.Pair;
 
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
@@ -69,7 +69,7 @@ public class GrapheLexical {
 	}
 
 	/*
-	 * ajoute un nouveau mot dans le graph
+	 * update la valeur d'un mot du graph
 	 */
 	public void updateMot(String mot1, int val) {
 
@@ -125,9 +125,9 @@ public class GrapheLexical {
 				add("zoo");
 			}
 		};
+		
 		GrapheLexical graph = new GrapheLexical(connaissanceInitial, corrpus);
-
-		 graph.updateMot("zoo", 100);
+		graph.updateMot("zoo", 100);
 		 
 		System.out.println(graph);
 		System.out.println("similarite entre 2 mot : elephant et lion = "
