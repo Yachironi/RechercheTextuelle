@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.CompareGenerator;
-
-
 public class SuffixArray {
 	private MonolingualCorpus corpus;
 	private ArrayList<Integer> suffixArray;
