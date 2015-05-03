@@ -2,12 +2,13 @@ package grapheLexical;
 
 import java.util.ArrayList;
 
+import org.deeplearning4j.word2vec.Word2Vec;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
 import utils.Paire;
 
-public class GrapheLexical {
+class GrapheLexical {
 	SimpleWeightedGraph<Paire<String, Integer>, DefaultWeightedEdge> completeGraph;
 
 	/**
@@ -27,13 +28,18 @@ public class GrapheLexical {
 			completeGraph.addVertex(new Paire<String, Integer>(corrpus.get(i),
 					0));
 		}
-
+		
 		for (Paire<String, Integer> vertexSource : completeGraph.vertexSet()) {
-			for (Paire<String, Integer> vertexDestination : completeGraph.vertexSet()) {
-				if((vertexDestination!=vertexSource)&&(completeGraph.getEdge(vertexDestination, vertexSource)==null)){
-				DefaultWeightedEdge edge = completeGraph.addEdge(vertexSource, vertexDestination);
-				completeGraph.setEdgeWeight(edge, 10);
-				
+
+			for (Paire<String, Integer> vertexDestination : completeGraph
+					.vertexSet()) {
+				if ((vertexDestination != vertexSource)
+						&& (completeGraph.getEdge(vertexDestination,
+								vertexSource) == null)) {
+					DefaultWeightedEdge edge = completeGraph.addEdge(
+							vertexSource, vertexDestination);
+					completeGraph.setEdgeWeight(edge, 10);
+
 				}
 				// TODO Remplacer 10 par la valeur donné par la bibliotheque
 				// WORD2VEC
@@ -58,7 +64,7 @@ public class GrapheLexical {
 		ArrayList<String> connaissanceInitial = new ArrayList<String>() {
 			{
 				add("elephant");
-				add("gazelle");	
+				add("gazelle");
 			}
 		};
 		ArrayList<String> corrpus = new ArrayList<String>() {
@@ -73,5 +79,15 @@ public class GrapheLexical {
 		GrapheLexical graph = new GrapheLexical(connaissanceInitial, corrpus);
 
 		System.out.println(graph);
+
+		Word2Vec vec = new Word2Vec(corrpus);
+		vec.setLayerSize(300);
+		vec.setWindow(5);
+		
+		System.out.println(vec.similarity("lion", "lion"));
+		System.out.println(vec.similarity("lion", "cub"));
+		System.out.println(vec.similarity("lion", "lioness"));
+		System.out.println(vec.similarity("lion", "cat"));
+		System.out.println("FIN");
 	}
 }
