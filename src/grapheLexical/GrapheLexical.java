@@ -99,7 +99,7 @@ class GrapheLexical {
 			}
 		}
 	}
-
+ 
 	// ajouter , enlever , voir la similarité entre 2 mots,
 
 	/*
