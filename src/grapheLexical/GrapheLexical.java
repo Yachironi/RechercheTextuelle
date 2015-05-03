@@ -2,7 +2,6 @@ package grapheLexical;
 
 import java.util.ArrayList;
 
-import org.deeplearning4j.word2vec.Word2Vec;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
 
@@ -30,7 +29,6 @@ class GrapheLexical {
 		}
 		
 		for (Paire<String, Integer> vertexSource : completeGraph.vertexSet()) {
-
 			for (Paire<String, Integer> vertexDestination : completeGraph
 					.vertexSet()) {
 				if ((vertexDestination != vertexSource)
@@ -45,6 +43,55 @@ class GrapheLexical {
 				// WORD2VEC
 			}
 		}
+	}
+
+	// ajouter , enlever , voir la similarité entre 2 mots,
+
+	/*
+	 * return le taux de similarite entre 2 mot, -1 si il ne trouve pas, c'est a
+	 * dire un des deux mots n'existe pas
+	 */
+	public double similarite2Mots(String mot1, String mot2) {
+
+		for (DefaultWeightedEdge edge : completeGraph.edgeSet()) {
+			if ((completeGraph.getEdgeSource(edge).getFirst().equals(mot1) && completeGraph
+					.getEdgeTarget(edge).getFirst().equals(mot2))
+					|| (completeGraph.getEdgeSource(edge).getFirst().equals(mot2) && completeGraph
+.getEdgeTarget(edge)
+							.getFirst().equals(mot1))) {
+
+				return completeGraph.getEdgeWeight(edge);
+			}
+		}
+		return -1;
+	}
+
+	/*
+	 * update la valeur d'un mot du graph
+	 */
+	public void updateMot(String mot1, int val) {
+
+		for (Paire<String, Integer> vertex : completeGraph.vertexSet()) {
+			if (vertex.getFirst().equals(mot1)) {
+				vertex.setSecond(val);
+				System.out.println("update de "+ mot1 + " avec success : new val " + vertex.getSecond());
+			}
+		}
+		
+	}
+
+	/* supprime un mot du graph */
+	public boolean suppMot(String mot) {
+		for (Paire<String, Integer> vertex : completeGraph.vertexSet()) {
+			if (vertex.getFirst().equals(mot)) {
+				completeGraph.removeVertex(vertex);
+				System.out.println("le mot : " + mot
+						+ " a été supprimé du graph.");
+				return true;
+			}
+		}
+		System.out.println("le mot : " + mot + " n'existe pas.");
+		return false;
 	}
 
 	@Override
@@ -76,18 +123,14 @@ class GrapheLexical {
 				add("zoo");
 			}
 		};
+		
 		GrapheLexical graph = new GrapheLexical(connaissanceInitial, corrpus);
-
+		graph.updateMot("zoo", 100);
+		 
 		System.out.println(graph);
 
-		Word2Vec vec = new Word2Vec(corrpus);
-		vec.setLayerSize(300);
-		vec.setWindow(5);
-		
-		System.out.println(vec.similarity("lion", "lion"));
-		System.out.println(vec.similarity("lion", "cub"));
-		System.out.println(vec.similarity("lion", "lioness"));
-		System.out.println(vec.similarity("lion", "cat"));
-		System.out.println("FIN");
+		System.out.println("similarite entre 2 mot : elephant et lion = "
+				+ graph.similarite2Mots("elephant", "lion"));
+
 	}
 }
