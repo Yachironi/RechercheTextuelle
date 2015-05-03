@@ -4,30 +4,25 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.LineNumberReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 import tableau_suffixe.MonolingualCorpus;
 import tableau_suffixe.SuffixArray;
-import traducteur.ComparatorResultTraduction;
 import traducteur.CoupleInt;
 import traducteur.ListCoupleInt;
 
 public class Traducteur {
 	private SuffixArray suffixArray_lang1;	// fr
 	private SuffixArray suffixArray_lang2;	// eng
-	//private HashMap<Integer, Integer> link;
 	private ListCoupleInt link;
 	private HashMap<CoupleInt, Integer> position;
 	// Correspondances de la langue 1 vers la langue 2
@@ -40,11 +35,11 @@ public class Traducteur {
 		suffixArray_lang1 = new SuffixArray(corpus, lang1);		
 		suffixArray_lang2 = new SuffixArray(corpus, lang2);
 		
-		String fileName_link = "coco";
-		initLink(fileName_link, link);
-		System.out.println(this.link);
-		String fileName_correspondance_12 = "";	// TODO
-		String fileName_correspondance_21 = "";	// TODO
+		String fileWriteStructurelink = "Files/structure_link";
+		initLink(fileWriteStructurelink, link);
+		//System.out.println(this.link);
+		String fileName_correspondance_12 = "Files/correspondances_" + lang1 + "_" + lang2;
+		String fileName_correspondance_21 = "Files/correspondances_" + lang2 + "_" + lang1;
 		listCorrespondances_lang12 = loadCorrespondances(fileName_correspondance_12);
 		listCorrespondances_lang21 = loadCorrespondances(fileName_correspondance_21);
 	}
@@ -271,9 +266,9 @@ public class Traducteur {
 	 * @param phrase
 	 * @return
 	 */
-	public ArrayList<String> traduct(String phrase, String lang1, String lang2){
+	//public ArrayList<String> traduct(String phrase, String lang1, String lang2){
+	public TreeMap<String, ArrayList<String>> traduct(String phrase, String lang1, String lang2){
 		ArrayList<String> resultat_traduction = new ArrayList<String>();
-		
 		
 		// Contient les id des phrases de la recherche dans la langue initiale
 		ArrayList<Integer> list_IdPhrases;
@@ -281,38 +276,37 @@ public class Traducteur {
 		// Contient les id des phrases de la recherche dans la langue traduite
 		ArrayList<Integer> list_IdPhrases_traduit = new ArrayList<Integer>();
 		
+		ArrayList<ListCoupleInt> correspondances = new ArrayList<ListCoupleInt>();
+		
+		CoupleInt int_and_pos;
+		
+		ArrayList<String> phrasesReellesLangTrad1 = new ArrayList<String>();
+		ArrayList<String> phrasesReellesLangTrad2 = new ArrayList<String>();
+		
+		HashMap<String, ArrayList<String>> listResultats = new HashMap<String, ArrayList<String>>();
+		
+		int nbResultats = 0;
+		
 		// Cas ou on veut traduire de suffixArray_lang1 -> suffixArray_lang2
 		if(suffixArray_lang1.getCorpus().getLangue().equals(lang1) && 
 				suffixArray_lang2.getCorpus().getLangue().equals(lang2)){
 			list_IdPhrases = suffixArray_lang1.getAllPositionsOfPhrase(phrase);
 
-			int pos_traduit;
 			// On effectue la traduction
 			for(Integer pos : list_IdPhrases){
-				pos_traduit = link.getOtherInt(pos);
-				if(pos_traduit != -1){
-					list_IdPhrases_traduit.add(pos_traduit);	
+				nbResultats++;
+				phrasesReellesLangTrad1.add(suffixArray_lang1.getCorpus().getReellePhrase(pos));
+				int_and_pos = link.getOtherIntAndPosition(pos);
+				if(int_and_pos != null){
+					phrasesReellesLangTrad2.add(suffixArray_lang2.getCorpus().getReellePhrase(int_and_pos.getI1()));
+					//list_IdPhrases_traduit.add(int_and_pos.getI1());
+					correspondances.add(listCorrespondances_lang12.get(int_and_pos.getI2()));
 				}
 			}
-			System.out.println(list_IdPhrases_traduit);
-			
-			ArrayList<CoupleInt> concordance = new ArrayList<CoupleInt>();
-			
-			/*for(int i=0; i<list_IdPhrases.size();i++){
-				if(position.containsKey(new CoupleInt(list_IdPhrases.get(i), list_IdPhrases_traduit.get(i)))){
-					concordance.add(position.get(new CoupleInt(list_IdPhrases.get(i), list_IdPhrases_traduit.get(i))));
-				}
-			}
-			*/
-			
-			
-			
-			
-			
+					
 			/**
-			 * TODO : on doit chercher dans suffixArray_lang2 les 
-			 * phrases dont les id sont dans list_IdPhrases_traduit
-			 */
+			 * Remarque : pas besoin de ça grace a phrasesReellesLangTrad2 qui est la traduct?
+			 
 			int position_corpus;
 			String phraseAtPosi;
 			for(Integer pos : list_IdPhrases_traduit)
@@ -323,9 +317,35 @@ public class Traducteur {
 				 phraseAtPosi = suffixArray_lang2.getCorpus().getSuffixFromPosition(position_corpus);
 				 resultat_traduction.add(phraseAtPosi);
 			}
+			*/
 			// On trie de la plus pertinente a la moins pertinente
-			Collections.sort(resultat_traduction, new ComparatorResultTraduction());
-			return resultat_traduction;
+			//Collections.sort(resultat_traduction, new ComparatorResultTraduction());
+			
+			// Recherche des mots a surlignes
+			if(nbResultats!= phrasesReellesLangTrad1.size() || nbResultats!=phrasesReellesLangTrad2.size() || nbResultats!=correspondances.size()){
+				System.err.println("Erreur dans le nb de resultats de la traduction");
+			}
+			ArrayList<ArrayList<String>> listMotsASurligner = new ArrayList<ArrayList<String>>();
+			for(int i=0; i<nbResultats; i++){
+				listMotsASurligner.add(getMotsASurligner(phrase, phrasesReellesLangTrad1.get(i), phrasesReellesLangTrad2.get(i), correspondances.get(i)));
+			}
+			
+			/**
+			 * Ici, phrasesReellesLangTrad2 = resultat de la traduction
+			 * listMotsASurligner = la liste de la liste des mots a surligner
+			 */
+			/*
+			 * Il gaut trier phrasesRellesLangTrad2 de la + a la - pertinente
+			 *  PB : il faut aussi trier listMotsASurligner dans le meme ordre..
+			 */
+			for(int i=0; i<nbResultats; i++){
+				listResultats.put(phrasesReellesLangTrad2.get(i), listMotsASurligner.get(i));
+			}
+			// On trie la hashmap
+			return doSort(listResultats);
+			
+			//return resultat_traduction;
+			//return phrasesReellesLangTrad2;
 		}
 		
 		// Cas ou on veut traduire de suffixArray_lang2 -> suffixArray_lang1
@@ -333,27 +353,20 @@ public class Traducteur {
 				suffixArray_lang1.getCorpus().getLangue().equals(lang2)){
 			list_IdPhrases = suffixArray_lang2.getAllPositionsOfPhrase(phrase);
 			
-			int pos_traduit;
 			// On effectue la traduction
 			for(Integer pos : list_IdPhrases){
-				pos_traduit = link.getOtherInt(pos);
-				if(pos_traduit != -1){
-					list_IdPhrases_traduit.add(pos_traduit);	
+				phrasesReellesLangTrad1.add(suffixArray_lang2.getCorpus().getReellePhrase(pos));
+				int_and_pos = link.getOtherIntAndPosition(pos);
+				if(int_and_pos != null){
+					phrasesReellesLangTrad2.add(suffixArray_lang1.getCorpus().getReellePhrase(int_and_pos.getI1()));
+					list_IdPhrases_traduit.add(int_and_pos.getI1());
+					correspondances.add(listCorrespondances_lang21.get(int_and_pos.getI2()));
 				}
 			}
 			
-			/*TODO : utiliser la nouvelleFonction getPosition */
-			/*ArrayList<Integer> concordance = new ArrayList<Integer>();
-			for(int i=0; i<list_IdPhrases.size();i++){
-				if(position.containsKey(new CoupleInt(list_IdPhrases.get(i), list_IdPhrases_traduit.get(i)))){
-					concordance.add(position.get(new CoupleInt(list_IdPhrases.get(i), list_IdPhrases_traduit.get(i))));
-				}
-			}
-			*/
 			/**
-			 * TODO : on doit chercher dans suffixArray_lang1 les 
-			 * phrases dont les id sont dans list_IdPhrases_traduit
-			 */
+			 * Remarque : pas besoin de ça grace a phrasesReellesLangTrad2 qui est la traduct?
+			 
 			int position_corpus;
 			String phraseAtPosi;
 			for(Integer pos : list_IdPhrases_traduit)
@@ -362,7 +375,36 @@ public class Traducteur {
 				 phraseAtPosi = suffixArray_lang1.getCorpus().getSuffixFromPosition(position_corpus);
 				 resultat_traduction.add(phraseAtPosi);
 			}	
-			return resultat_traduction;
+			*/
+			// On trie de la plus pertinente a la moins pertinente
+			//Collections.sort(resultat_traduction, new ComparatorResultTraduction());
+
+			// Recherche des mots a surlignes
+			if(nbResultats!= phrasesReellesLangTrad1.size() || nbResultats!=phrasesReellesLangTrad2.size() || nbResultats!=correspondances.size()){
+				System.err.println("Erreur dans le nb de resultats de la traduction");
+			}
+			ArrayList<ArrayList<String>> listMotsASurligner = new ArrayList<ArrayList<String>>();
+			for(int i=0; i<nbResultats; i++){
+				listMotsASurligner.add(getMotsASurligner(phrase, phrasesReellesLangTrad1.get(i), phrasesReellesLangTrad2.get(i), correspondances.get(i)));
+			}
+			
+			/**
+			 * Ici, phrasesReellesLangTrad2 = resultat de la traduction
+			 * listMotsASurligner = la liste de la liste des mots a surligner
+			 */
+			/*
+			 * Il gaut trier phrasesRellesLangTrad2 de la + a la - pertinente
+			 *  PB : il faut aussi trier listMotsASurligner dans le meme ordre..
+			 */
+			for(int i=0; i<nbResultats; i++){
+				listResultats.put(phrasesReellesLangTrad2.get(i), listMotsASurligner.get(i));
+			}
+			// On trie la hashmap
+			return doSort(listResultats);
+			
+			
+			//return resultat_traduction;
+			//return phrasesReellesLangTrad2;
 			
 		}
 		// Probleme
@@ -370,6 +412,30 @@ public class Traducteur {
 			System.err.println("Erreur : les langues sont differentes des langues des corpus");
 		}
 		return null;
+	}
+	
+	/**
+	 * Trie le resultat  de la traduction de la + pertinente a la - pertinente
+	 * @param map
+	 * @return
+	 */
+	public TreeMap<String, ArrayList<String>> doSort(HashMap<String, ArrayList<String>> map) {
+		 TreeMap<String, ArrayList<String>> sortedMap = new TreeMap<String, ArrayList<String>>(new Comparator<String>(){
+             @Override
+             public int compare(String o1, String o2) {
+            	if(o1.length() < o2.length()){
+            		return -1;
+         		}
+         		else if(o1.length() > o2.length()){
+         			return 1;
+         		}
+         		else{
+         			return o1.compareTo(o2);
+         		}
+             }
+         });
+		 sortedMap.putAll(map);
+		 return sortedMap;
 	}
 	
 	
@@ -400,6 +466,63 @@ public class Traducteur {
 		return list;
 	}
 		
+	
+	public ArrayList<String> getMotsASurligner(String recherche, String phraseLang1, String phraseLang2, ListCoupleInt correspondance){
+		ArrayList<String> res = new ArrayList<String>();
+		
+		String[] recherche_tokenize = MonolingualCorpus.tokenize(recherche);
+		String[] phraseLang1_tokenize = MonolingualCorpus.tokenize(phraseLang1);
+		String[] phraseLang2_tokenize = MonolingualCorpus.tokenize(phraseLang2);
+
+		int pos, pos_correspondance;
+		for(String token : recherche_tokenize){
+			// on obtient la position dans la correspondance (partie gauche)
+			pos = searchStringInTab(token, phraseLang1_tokenize);
+			if(pos != -1){
+				// on obtient la position dans la correspondance (partie droite)
+				pos_correspondance = searchPositionCorrespondance(pos, correspondance);
+				/**
+				 * TODO A VERIFIER : ici on prend tout, meme si il y a 0-0 et 0-1
+				 * --> Si il faut prendre uniquement 0-1, il faut regarder dans 
+				 * searchPositionCorrespondance si le prochain c.getI1() n'a pas la meme valeur
+				 * que i1 (passe en parametre)
+				 * ------> peut-etre que ce n'est pas une bonne idee de choisir le dernier
+				 * (0-1) car en francais un mot peut etre egal a 2 mots en anglais..
+				 */
+				res.add(phraseLang2_tokenize[pos_correspondance]);
+			}
+		}
+
+		return res;
+	}
+	
+	public int searchStringInTab(String string, String[] tab){
+		int pos=0;
+		for(String s : tab){
+			if(s.equals(string)){
+				return pos;
+			}
+			pos++;
+		}
+		return -1;
+	}
+	
+	public int searchPositionCorrespondance(int i1, ListCoupleInt list){
+		for(CoupleInt c : list){
+			if(c.getI1() == i1){
+				return c.getI2();
+			}
+		}
+		return -1;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	/**
 	 * Getter & Setter

@@ -94,4 +94,18 @@ public class ListCoupleInt extends ArrayList<CoupleInt>{
 		}
 		return -1;
 	}
+	
+	public CoupleInt getOtherIntAndPosition(int i){
+		int pos=0;
+		for(CoupleInt c : this){
+			if(c.getI1() == i){
+				return new CoupleInt(c.getI2(), pos);
+			}
+			else if(c.getI2() == i){
+				return new CoupleInt(c.getI1(), pos);
+			}
+			pos++;
+		}
+		return null;
+	}
 }

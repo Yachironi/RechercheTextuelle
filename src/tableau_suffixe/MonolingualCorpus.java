@@ -329,7 +329,7 @@ public class MonolingualCorpus implements Serializable {
 	 * @param chaine
 	 * @return
 	 */
-	public String[] tokenize(String chaine) {
+	public static String[] tokenize(String chaine) {
 		return chaine.split("\\W+");
 	}
 
