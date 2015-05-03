@@ -207,8 +207,7 @@ public class Traducteur {
 				StringTokenizer tokenize = new StringTokenizer(ligne);
 				int line1 = Integer.parseInt(tokenize.nextToken());
 				int line2 = Integer.parseInt(tokenize.nextToken());
-				System.out.println(line1);
-				System.out.println(line2);
+				
 				// Condition pour ajouter le couple d'entier : il faut que les phrases liees
 				// appartiennent aux 2 corpus
 				if(!link.contains_couple(new CoupleInt(line1, line2)) && !link.contains_couple(new CoupleInt(line2, line1)))
