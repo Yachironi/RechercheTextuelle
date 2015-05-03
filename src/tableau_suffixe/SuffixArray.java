@@ -61,10 +61,10 @@ public class SuffixArray {
 			}
 		};
 		System.out.println("1-3");
-		Collections.sort(suffixArray, comparator);
-		qsort ( suffixArray , 0 , suffixArray.size()-1 ) ;
+		//Collections.sort(suffixArray, comparator);
+		//qsort ( suffixArray , 0 , suffixArray.size()-1 ) ;
 		System.out.println("1-4");
-		try {
+		/*try {
 			setLcp();
 			System.out.println("&-3");
 		} catch (TokenNotFoundException e) {

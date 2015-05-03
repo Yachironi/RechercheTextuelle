@@ -13,6 +13,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 import java.util.TreeMap;
 
 import tableau_suffixe.MonolingualCorpus;
@@ -24,7 +25,6 @@ public class Traducteur {
 	private SuffixArray suffixArray_lang1;	// fr
 	private SuffixArray suffixArray_lang2;	// eng
 	private ListCoupleInt link;
-	private HashMap<CoupleInt, Integer> position;
 	// Correspondances de la langue 1 vers la langue 2
 	private ArrayList<ListCoupleInt> listCorrespondances_lang12;
 	
@@ -204,12 +204,15 @@ public class Traducteur {
 			int i=0;
 			while ((ligne = br.readLine()) != null) {
 				// On parse la ligne en enlevant les espaces
-				tab = ligne.split(" ");
-				int line1 = Integer.parseInt(tab[0]);
-				int line2 = Integer.parseInt(tab[1]);
+				StringTokenizer tokenize = new StringTokenizer(ligne);
+				int line1 = Integer.parseInt(tokenize.nextToken());
+				int line2 = Integer.parseInt(tokenize.nextToken());
+				System.out.println(line1);
+				System.out.println(line2);
 				// Condition pour ajouter le couple d'entier : il faut que les phrases liees
 				// appartiennent aux 2 corpus
 				if(!link.contains_couple(new CoupleInt(line1, line2)) && !link.contains_couple(new CoupleInt(line2, line1)))
+					
 					if((suffixArray_lang1.getCorpus().getTab_line().contains_i2(line1)
 							&& suffixArray_lang2.getCorpus().getTab_line().contains_i2(line2)
 							||
@@ -217,8 +220,6 @@ public class Traducteur {
 							&& suffixArray_lang1.getCorpus().getTab_line().contains(line2)))){
 		
 						link.add(new CoupleInt(line1, line2));	
-						position.put(new CoupleInt(line1, line2), i);
-						i++;
 					}	
 				}
 			
@@ -305,7 +306,7 @@ public class Traducteur {
 			}
 					
 			/**
-			 * Remarque : pas besoin de ça grace a phrasesReellesLangTrad2 qui est la traduct?
+			 * Remarque : pas besoin de ï¿½a grace a phrasesReellesLangTrad2 qui est la traduct?
 			 
 			int position_corpus;
 			String phraseAtPosi;
@@ -365,7 +366,7 @@ public class Traducteur {
 			}
 			
 			/**
-			 * Remarque : pas besoin de ça grace a phrasesReellesLangTrad2 qui est la traduct?
+			 * Remarque : pas besoin de ï¿½a grace a phrasesReellesLangTrad2 qui est la traduct?
 			 
 			int position_corpus;
 			String phraseAtPosi;
@@ -577,9 +578,9 @@ public class Traducteur {
 	
 	
 	public static void main(String[] args) {
-		Traducteur test = new Traducteur("fra","eng","Files/test-2.csv","Files/link.csv");
+		Traducteur test = new Traducteur("fra","eng","Files/sentences.csv","Files/links.csv");
 		test.writePhrasesInParallel("Files/testFr.txt","Files/testEng.txt");
-		System.out.println(test.traduct("je", "fra", "eng"));
+		//System.out.println(test.traduct("je", "fra", "eng"));
 	
 	}
 }
