@@ -577,18 +577,9 @@ public class Traducteur {
 	
 	
 	public static void main(String[] args) {
-		
-	
 		Traducteur test = new Traducteur("fra","eng","Files/test-2.csv","Files/link.csv");
 		test.writePhrasesInParallel("Files/testFr.txt","Files/testEng.txt");
 		System.out.println(test.traduct("je", "fra", "eng"));
 	
-		
-		/*
-		ArrayList<ListCoupleInt> list = Traducteur.loadCorrespondances("Files/correspondance_test.txt");
-		for(ListCoupleInt l : list){
-			System.out.println(l);
-		}
-		*/
 	}
 }

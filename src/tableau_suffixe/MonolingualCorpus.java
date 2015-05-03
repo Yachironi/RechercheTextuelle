@@ -92,6 +92,7 @@ public class MonolingualCorpus implements Serializable {
 			}
 			System.out.println("Fin write");
 		}
+		System.out.println("finisInit");
 
 	}
 
@@ -108,28 +109,24 @@ public class MonolingualCorpus implements Serializable {
 			dictionnaire.put("$$", val_$$);
 
 			while ((ligne = br.readLine()) != null) {
-				
+				//System.out.println(br.readLine());
 				tab = tokenize(ligne);
-				//id_ligne = Integer.parseInt(tab[0]);
-				
 				// On prend que les donnees de la langue choisie
 				if (tab.length>1 && tab[1].equals(langue)) {
 					id_ligne = Integer.parseInt(tab[0]);
 					// on ajoute la phrase reelle
 					//listPhrasesReelles.put(id_ligne, reelleLigne(ligne, tab));
 					listPhrasesReelles.put(id_ligne, reelleLigne(ligne, tab));
-
+					
 					// On lit le tableau parse (on commence a i=2 car on prend
 					// pas le int et la langue
 					for (i = 2; i < tab.length; i++) {
 						// On transforme la chaine en minuscule
 						token = tab[i].toLowerCase();
-						
 						// ajout du couple (position du 1er mot de la ligne, 
 						//	numero de la ligne)
 						if(i==2){
 							tab_line.add(new CoupleInt(corpus.size(), id_ligne));
-
 						}
 						
 						// On ajoute le token au dictionnaire s'il n'y ait pas
@@ -165,6 +162,7 @@ public class MonolingualCorpus implements Serializable {
 					}
 				}
 			}
+			System.out.println(tab_line.get(tab_line.size()-1));
 			return true;
 		} catch (Exception e) {
 			
@@ -294,6 +292,7 @@ public class MonolingualCorpus implements Serializable {
 	public int compareSuffixesInt(int position1, int position2){
 
 		try {
+			System.out.println("Je rentre");
 			String chaine1 = getSuffixFromPosition(position1);
 			String chaine2 = getSuffixFromPosition(position2);
 			if(position1==position2 || chaine1.equals(chaine2)) return 0;
@@ -479,9 +478,9 @@ public class MonolingualCorpus implements Serializable {
 	 * 
 	 * @param ligne
 	 * @param tab
-	 *            Permet d'enlever des caractï¿½res de ponctuation eventuellement
+	 *            Permet d'enlever des caracteres de ponctuation eventuellement
 	 *            present
-	 * @return un string, la "vraie" ligne, sans l'integer et la langue au dï¿½but
+	 * @return un string, la "vraie" ligne, sans l'integer et la langue au debut
 	 *         de la ligne
 	 */
 	private String reelleLigne(String ligne, String[] tab) {
@@ -526,7 +525,7 @@ public class MonolingualCorpus implements Serializable {
 	}
 
 	/**
-	 * Permet d'enlever des caractï¿½res de ponctuation eventuellement present a
+	 * Permet d'enlever des caracteres de ponctuation eventuellement present a
 	 * la fin du token
 	 * 
 	 * @param token
@@ -569,8 +568,7 @@ public class MonolingualCorpus implements Serializable {
 	public void setLangue(String langue) {
 		this.langue = langue;
 	}
-
-
+	
 	public ListCoupleInt getTab_line() {
 		return tab_line;
 	}
@@ -619,8 +617,11 @@ public class MonolingualCorpus implements Serializable {
 		String fileName = "Files/sentences.csv"; // A CHANGER AVANT DE TESTER
 		
 		System.out.println("Lancement de MonolingualCorpus");
-		MonolingualCorpus mc = new MonolingualCorpus(fileName, "fra");
-		
+		//MonolingualCorpus mc = new MonolingualCorpus(fileName, "fra");
+		SuffixArray t = new SuffixArray(fileName, "fra");
+		System.out.println("Recherche");
+		System.out.println(t.getAllPositionsOfPhrase("a demandé"));
+		System.out.println("Fin Recherche");
 	}
 	
 	
