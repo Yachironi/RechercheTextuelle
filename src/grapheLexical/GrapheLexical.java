@@ -101,7 +101,7 @@ class GrapheLexical {
 	}  
  
 	// ajouter , enlever , voir la similarité entre 2 mots,
-	// ****
+	// **** *
 
 	/*
 	 * return le taux de similarite entre 2 mot, -1 si il ne trouve pas, c'est a
