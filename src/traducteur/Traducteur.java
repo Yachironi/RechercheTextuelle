@@ -41,7 +41,7 @@ public class Traducteur {
 	public Traducteur(String lang1, String lang2, String corpus, String link){
 		suffixArray_lang1 = new SuffixArray(corpus, lang1);		
 		suffixArray_lang2 = new SuffixArray(corpus, lang2);
-		
+		position = new HashMap<CoupleInt, Integer>();
 		String fileName_link = "coco";
 		initLink(fileName_link, link);
 		System.out.println(this.link);
@@ -207,13 +207,16 @@ public class Traducteur {
 					new FileInputStream(fileName), "UTF8"));
 			String ligne;
 			String[] tab;
+			
 			// On parcours l'ensemble du fichier link
 			int i=0;
 			while ((ligne = br.readLine()) != null) {
+				 
 				// On parse la ligne en enlevant les espaces
 				tab = ligne.split(" ");
 				int line1 = Integer.parseInt(tab[0]);
 				int line2 = Integer.parseInt(tab[1]);
+				 
 				// Condition pour ajouter le couple d'entier : il faut que les phrases liees
 				// appartiennent aux 2 corpus
 				if(!link.contains_couple(new CoupleInt(line1, line2)) && !link.contains_couple(new CoupleInt(line2, line1)))
@@ -222,9 +225,12 @@ public class Traducteur {
 							||
 					   (suffixArray_lang2.getCorpus().getTab_line().contains(line1)
 							&& suffixArray_lang1.getCorpus().getTab_line().contains(line2)))){
-		
+					
+						 
 						link.add(new CoupleInt(line1, line2));	
+						 
 						position.put(new CoupleInt(line1, line2), i);
+						 
 						i++;
 					}	
 				}
@@ -458,7 +464,7 @@ public class Traducteur {
 	public static void main(String[] args) {
 		
 	
-		Traducteur test = new Traducteur("fra","eng","Files/test-2.csv","Files/link.csv");
+		Traducteur test = new Traducteur("fra","eng","Files/testCorpus.txt","Files/link.txt");
 		test.writePhrasesInParallel("Files/testFr.txt","Files/testEng.txt");
 		System.out.println(test.traduct("je", "fra", "eng"));
 	

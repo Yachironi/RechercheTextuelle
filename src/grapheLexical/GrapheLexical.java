@@ -1,13 +1,24 @@
 package grapheLexical;
 
 import java.util.ArrayList;
-
+import java.util.HashSet;
 import nlp.smt.tools.Pair;
-
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleWeightedGraph;
-
 import utils.Paire;
+
+/*
+import org.deeplearning4j.models.word2vec.VocabWord;
+import org.deeplearning4j.models.word2vec.Word2Vec;
+import org.deeplearning4j.models.word2vec.wordstore.VocabCache;
+import org.deeplearning4j.models.word2vec.wordstore.inmemory.InMemoryLookupCache;
+import org.deeplearning4j.text.sentenceiterator.LineSentenceIterator;
+import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
+import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
+import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
+import org.deeplearning4j.util.SerializationUtils;
+import org.springframework.core.io.ClassPathResource;
+*/
 
 public class GrapheLexical {
 	SimpleWeightedGraph<Paire<String, Integer>, DefaultWeightedEdge> completeGraph;
@@ -69,7 +80,7 @@ public class GrapheLexical {
 	}
 
 	/*
-	 * ajoute un nouveau mot dans le graph
+	 * update un nouveau mot dans le graph
 	 */
 	public void updateMot(String mot1, int val) {
 
@@ -109,6 +120,57 @@ public class GrapheLexical {
 		return sb.toString();
 	}
 
+	
+	
+	
+	
+	
+	
+/*
+	
+	public LexicalGraph(Word2Vec vec ) {
+		  
+		VocabCache cache = vec.getCache();
+		HashSet<String> dejaVu = new HashSet<String>();
+		
+		for (String a : cache.words()) {
+			for (String b : cache.words()) {
+				if (!dejaVu.contains(b)) {
+					SimilarityValue sv = new SimilarityValue(a, b, vec.similarity(a, b));
+					arcs.add(sv);
+				}
+			}
+			dejaVu.add(a);
+		}
+	}
+	
+	public void print() {
+		 SentenceIterator iter;
+		 TokenizerFactory tokenizer;
+		 VocabCache cache;
+		 Word2Vec vec;
+		 
+		 tokenizer = new DefaultTokenizerFactory();
+		 iter = new LineSentenceIterator();
+		 vec = new Word2Vec.Builder().minWordFrequency(5).vocabCache(cache)
+				.windowSize(5)
+				.layerSize(100).iterate(iter).tokenizerFactory(tokenizer)
+				.build();
+
+		String mot1 = new String("test");
+		String mot2 = new String("tester");
+		System.out.printf("similarite entre test et tester =  %f \n", vec.similarity(mot1, mot2));
+		 
+	}
+	
+	
+	*/
+	
+	
+	
+	
+	
+	
 	public static void main(String[] args) {
 		ArrayList<String> connaissanceInitial = new ArrayList<String>() {
 			{
