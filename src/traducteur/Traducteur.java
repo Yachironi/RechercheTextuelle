@@ -210,6 +210,7 @@ public class Traducteur {
 				StringTokenizer tokenize = new StringTokenizer(ligne);
 				int line1 = Integer.parseInt(tokenize.nextToken());
 				int line2 = Integer.parseInt(tokenize.nextToken());
+
 				// Condition pour ajouter le couple d'entier : il faut que les phrases liees
 				// appartiennent aux 2 corpus
 				if(!link.contains_couple(new CoupleInt(line1, line2)) && !link.contains_couple(new CoupleInt(line2, line1)))
@@ -218,12 +219,8 @@ public class Traducteur {
 							&& suffixArray_lang2.getCorpus().getTab_line().contains_i2(line2)
 							||
 					   (suffixArray_lang2.getCorpus().getTab_line().contains(line1)
-							&& suffixArray_lang1.getCorpus().getTab_line().contains(line2)))){
-					
-						 
+							&& suffixArray_lang1.getCorpus().getTab_line().contains(line2)))){	 
 						link.add(new CoupleInt(line1, line2));	
-						 
-						 
 					}	
 				}
 			
@@ -582,7 +579,6 @@ public class Traducteur {
 	
 	
 	public static void main(String[] args) {
-		
 	
 		Traducteur test = new Traducteur("fra","eng","Files/testCorpus.txt","Files/link.txt");
 		test.writePhrasesInParallel("Files/testFr.txt","Files/testEng.txt");
