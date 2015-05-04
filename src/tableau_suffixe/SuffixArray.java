@@ -5,19 +5,20 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
-
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.CompareGenerator;
-
 
 public class SuffixArray {
 	private MonolingualCorpus corpus;
 	private ArrayList<Integer> suffixArray;
 	private ArrayList<Integer> lcpArray;
+	private static final Random RAND = new Random( ) ;
 
 	public SuffixArray(String fileName, String langue) {
 		corpus = new MonolingualCorpus(fileName, langue);
 		suffixArray = new ArrayList<Integer>();
+		System.out.println("1-1");
+		System.out.println(corpus.getTab_line().size());
 		for (int i = 0; i < corpus.getCorpus().size(); i++) {
 			if (corpus.getCorpus().get(i) != corpus.getValFinParagraphe()) {
 				suffixArray.add(i);
@@ -41,7 +42,6 @@ public class SuffixArray {
 				// suffixArray.add(corpus.getEncodedPhrase(corpus.getSuffixFromPosition(i)));
 			}
 		}
-		
 		/*
 		 * System.out.println(suffixArray);
 		 * 
@@ -54,13 +54,16 @@ public class SuffixArray {
 			@Override
 			public int compare(Integer o1, Integer o2) {
 				//return corpus.compareSuffixes(o1, o2);
-				return corpus.compareSuffixesInt(o1, o2);
+				return corpus.compareSuffixes(o1, o2);
 			}
 		};
-		
-		Collections.sort(suffixArray, comparator);
-		try {
+		System.out.println("1-3");
+		//Collections.sort(suffixArray, comparator);
+		//qsort ( suffixArray , 0 , suffixArray.size()-1 ) ;
+		System.out.println("1-4");
+		/*try {
 			setLcp();
+			System.out.println("&-3");
 		} catch (TokenNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -262,5 +265,38 @@ public class SuffixArray {
 			if (phrase.charAt(i) < suffixe.charAt(i)) return -1;
 		}
 		return 0;
+	}
+	
+	private void qsort(ArrayList<Integer> array, int begin, int end) {
+		System.out.println("debut qsort");
+			if (end > begin) {
+				System.out.println("Begin");
+				int index = begin + RAND.nextInt(end - begin) + 1;
+				int pivot = array.get(index);
+				{
+					int tmp = array.get(index);
+					array.set(index, array.get(end));
+					array.set(end, tmp);
+				}
+				for (int i = index = begin; i < end; ++i) {
+					System.out.println(i);
+					if (corpus.compareSuffixes(array.get(i), pivot) <= 0) {
+						int tmp = array.get(index);
+						array.set(index, array.get(i));
+						array.set(i, tmp);
+						index++;
+					}
+				}
+				{
+					int tmp = array.get(index);
+					array.set(index, array.get(end));
+					array.set(end, tmp);
+				}
+				System.out.println("Index : " + index + " ");
+				
+				qsort(array, begin, index - 1);
+				qsort(array, index + 1, end);
+			}
+		
 	}
 }
