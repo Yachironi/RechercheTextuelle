@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 
 import traducteur.CoupleInt;
 import traducteur.ListCoupleInt;
+import utils.TokenNotFoundException;
 
 public class MonolingualCorpus implements Serializable {
 	/**
@@ -163,6 +164,7 @@ public class MonolingualCorpus implements Serializable {
 				}
 			}
 			System.out.println(tab_line.get(tab_line.size()-1));
+			System.out.println(dictionnaire);
 			return true;
 		} catch (Exception e) {
 			
@@ -329,7 +331,7 @@ public class MonolingualCorpus implements Serializable {
 	 * @return
 	 */
 	public static String[] tokenize(String chaine) {
-		return chaine.split("\\W+");
+		return chaine.split("[\\p{Punct}\\s]+");
 	}
 
 	/**
@@ -460,9 +462,12 @@ public class MonolingualCorpus implements Serializable {
 	 * @throws TokenNotFoundException 
 	 */
 	public ArrayList<Integer> getEncodedPhrase(String phrase) throws TokenNotFoundException {
+		System.out.println(phrase);
+		System.out.println(dictionnaire);
 		String[] tokens = tokenize(phrase);
 		ArrayList<Integer> resultat = new ArrayList<>();
 		for (int i = 0; i < tokens.length; i++) {
+			System.out.println(tokens[i]);
 			if (dictionnaire.get(tokens[i]) != null) {
 				resultat.add(dictionnaire.get(tokens[i].toLowerCase()));
 			} 

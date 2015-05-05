@@ -1,0 +1,10 @@
+1 fra je suis un test.
+2 fra j'aime les pommes.
+3 eng I love apples.
+4 eng I am a test.
+5 eng my car is black.
+6 eng my car is yellow.
+7 eng my dog is red.
+8 fra ma voiture est noire.
+9 fra la voiture est jaune.
+10 fra mon chien est rouge.
