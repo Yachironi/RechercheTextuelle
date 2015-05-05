@@ -20,7 +20,7 @@ import org.springframework.core.io.ClassPathResource;
 
 import utils.Paire;
 
-class GrapheLexical {
+public class GrapheLexical {
 	SimpleWeightedGraph<Paire<String, Integer>, DefaultWeightedEdge> completeGraph;
 	private SentenceIterator iter;
 	private TokenizerFactory tokenizer;
