@@ -2,7 +2,13 @@ package exercice;
 
 import grapheLexical.GrapheLexical;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeMap;
 
 import com.sun.java.swing.plaf.motif.resources.motif;
@@ -41,8 +47,20 @@ public class Exercice {
 		phraseFiltre2 = new ArrayList<String>();
 		monTrad = new Traducteur("fra", "eng", "Files/testCorpus.txt",
 				"Files/link.txt");
+		if(!new File("GrapheLexical.ser").exists()){
 		monGraphLex = new GrapheLexical(connaissanceInitial, corrpus);
-
+		try {
+			monGraphLex.save();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		}else{
+			try {
+				monGraphLex = GrapheLexical.load();
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public Traducteur getMonTrad() {
@@ -78,7 +96,7 @@ public class Exercice {
 
 		// TODO : a remplacer l'arrayList s par la list contenant tout les
 		// lignes du corpus
-		TreeMap<String,Double> resultatTop = new TreeMap<>();
+		Map<String,Double> resultatTop = new HashMap<>();
 		
 		for (int i = 0; i < corpus.size(); i++) {
 			Double tauxmotinconue = tauxMotInconnu(corpus.get(i));
@@ -100,13 +118,35 @@ public class Exercice {
 				// if(
 				// phraseFiltre1.contains(monTrad.getSuffixArray_lang2().getCorpus().getPhraseFromLine(i))==false)//
 				// on ajoute si il n'y a pas de redondance de la même phrase
-				//resultatTop.put(corpus.get(i), tauxmotinconue);
-				phraseFiltre1.add(corpus.get(i));
-
+				resultatTop.put(corpus.get(i), tauxmotinconue);
+				//phraseFiltre1.add(corpus.get(i));
 			}
+		}
+		//System.out.println(resultatTop);
+		int i=10;
+		Map<String,Double> resultatTopNew= sortByValues(resultatTop);
+		
+		for(Map.Entry<String, Double> entry: resultatTopNew.entrySet()){
+			if(--i>0)
+			phraseFiltre1.add(entry.getKey());
+			else
+				break;
 		}
 	}
 
+	
+	public static <K, V extends Comparable<V>> Map<K, V> sortByValues(final Map<K, V> map) {
+	    Comparator<K> valueComparator =  new Comparator<K>() {
+	        public int compare(K k1, K k2) {
+	            int compare = map.get(k2).compareTo(map.get(k1));
+	            if (compare == 0) return 1;
+	            else return -compare;
+	        }
+	    };
+	    Map<K, V> sortedByValues = new TreeMap<K, V>(valueComparator);
+	    sortedByValues.putAll(map);
+	    return sortedByValues;
+	}
 	/* renvoye le taux de mot inconnu dans une phrase */
 
 	public double tauxMotInconnu(String phrase) {

@@ -2,8 +2,14 @@ package grapheLexical;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,12 +30,12 @@ import akka.japi.Pair;
 import scala.annotation.varargs;
 import utils.Paire;
 
-public class GrapheLexical {
+public class GrapheLexical implements Serializable {
 	SimpleWeightedGraph<Paire<String, Integer>, DefaultWeightedEdge> completeGraph;
 	HashMap<String, Integer> graphe;
-	private SentenceIterator iter;
-	private TokenizerFactory tokenizer;
-	private Word2Vec vec;
+	transient private SentenceIterator iter;
+	transient private TokenizerFactory tokenizer;
+	transient private Word2Vec vec;
 	public final static String VEC_PATH = "vec2.ser";
 	public final static String CACHE_SER = "cache.ser";
 
@@ -39,6 +45,48 @@ public class GrapheLexical {
 	 * @param connaissanceInitial
 	 *            Tableau de toutes les mots maitrisé par l'utilisateur
 	 */
+	
+	public void word2vecInitialiser(){
+		/* Initialisation de Word2Vec */
+		System.out.println("===== Initialisation de Word2Vec ======");
+		ClassPathResource resource = new ClassPathResource("phrasesENsaved.txt");
+		File f = null;
+		try {
+			f = resource.getFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.iter = new LineSentenceIterator(new File(f.getAbsolutePath()));
+		tokenizer = new DefaultTokenizerFactory();
+		VocabCache cache;
+
+		if (vec == null && !new File(VEC_PATH).exists()) {
+			cache = new InMemoryLookupCache.Builder().lr(2e-5)
+					.vectorLength(100).build();
+			vec = new Word2Vec.Builder().vocabCache(cache).windowSize(5)
+					.layerSize(100).iterate(iter).tokenizerFactory(tokenizer)
+					.build();
+			vec.setCache(cache);
+			vec.fit();
+			SerializationUtils.saveObject(vec, new File(VEC_PATH));
+			SerializationUtils.saveObject(cache, new File(CACHE_SER));
+		} else {
+			vec = SerializationUtils.readObject(new File(VEC_PATH));
+			cache = SerializationUtils.readObject(new File(CACHE_SER));
+			vec.setCache(cache);
+			System.out
+					.println("--------------------------------------------------");
+
+		}
+
+		// for(String s : cache.words())
+		// System.out.println("Vocab "+s);
+		System.out.println("===== Initialisation de Word2Vec ======");
+
+		/* Fin Initialisation de Word2Vec */
+
+	}
 	public GrapheLexical(ArrayList<String> connaissanceInitial,
 			ArrayList<String> corrpus) {
 
@@ -219,4 +267,27 @@ public class GrapheLexical {
 			}
 		}
 	}
+	
+	public static  GrapheLexical load() throws ClassNotFoundException, IOException{
+		File fichier =  new File("GrapheLexical.ser") ;
+		if(fichier.exists()){
+		ObjectInputStream ois =  new ObjectInputStream(new FileInputStream(fichier)) ;
+		GrapheLexical grapheLexical=null;
+		grapheLexical=(GrapheLexical)ois.readObject();
+		grapheLexical.word2vecInitialiser();
+		return grapheLexical;
+		}
+		else {
+			return null;
+		}
+	}
+	
+	public void save() throws FileNotFoundException, IOException{
+		File fichier =  new File("GrapheLexical.ser") ;
+		ObjectOutputStream oos =  new ObjectOutputStream(new FileOutputStream(fichier)) ;
+		oos.writeObject(this);
+	}
+	
+	
+	
 }

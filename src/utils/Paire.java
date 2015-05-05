@@ -1,6 +1,8 @@
 package utils;
 
-public class Paire<T1,T2> {
+import java.io.Serializable;
+
+public class Paire<T1,T2> implements Serializable{
 	
 	T1 first;
 	T2 second;
