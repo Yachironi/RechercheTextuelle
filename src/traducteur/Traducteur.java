@@ -41,8 +41,8 @@ public class Traducteur {
 		String fileName_correspondance_12 = "Files/correspondances_" + lang1 + "_" + lang2;
 		String fileName_correspondance_21 = "Files/correspondances_" + lang2 + "_" + lang1;
 		
-		listCorrespondances_lang12 = loadCorrespondances(fileName_correspondance_12);
-		listCorrespondances_lang21 = loadCorrespondances(fileName_correspondance_21);
+		//listCorrespondances_lang12 = loadCorrespondances(fileName_correspondance_12);
+		//listCorrespondances_lang21 = loadCorrespondances(fileName_correspondance_21);
 	}
 
 	/**
@@ -293,16 +293,18 @@ public class Traducteur {
 		if(suffixArray_lang1.getCorpus().getLangue().equals(lang1) && 
 				suffixArray_lang2.getCorpus().getLangue().equals(lang2)){
 			list_IdPhrases = suffixArray_lang1.getAllPositionsOfPhrase(phrase);
-
+			System.out.println(list_IdPhrases);
 			// On effectue la traduction
 			for(Integer pos : list_IdPhrases){
 				nbResultats++;
 				phrasesReellesLangTrad1.add(suffixArray_lang1.getCorpus().getReellePhrase(pos));
+				System.out.println(phrasesReellesLangTrad1);
 				int_and_pos = link.getOtherIntAndPosition(pos);
+				System.out.println(int_and_pos);
 				if(int_and_pos != null){
 					phrasesReellesLangTrad2.add(suffixArray_lang2.getCorpus().getReellePhrase(int_and_pos.getI1()));
 					//list_IdPhrases_traduit.add(int_and_pos.getI1());
-					correspondances.add(listCorrespondances_lang12.get(int_and_pos.getI2()));
+					//correspondances.add(listCorrespondances_lang12.get(int_and_pos.getI2()));
 				}
 			}
 					
@@ -518,13 +520,7 @@ public class Traducteur {
 		return -1;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
+
 	
 	/**
 	 * Getter & Setter
@@ -574,10 +570,7 @@ public class Traducteur {
 		this.listCorrespondances_lang21 = listCorrespondances_lang21;
 	}
 	
-	
-	
-	
-	
+
 	public static void main(String[] args) {
 	
 		Traducteur test = new Traducteur("fra","eng","Files/testCorpus.txt","Files/link.txt");

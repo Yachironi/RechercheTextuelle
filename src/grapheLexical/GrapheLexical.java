@@ -21,6 +21,7 @@ import org.springframework.core.io.ClassPathResource;
 import utils.Paire;
 
 class GrapheLexical {
+	
 	SimpleWeightedGraph<Paire<String, Integer>, DefaultWeightedEdge> completeGraph;
 	private SentenceIterator iter;
 	private TokenizerFactory tokenizer;
@@ -131,7 +132,7 @@ class GrapheLexical {
 			if (vertex.getFirst().equals(mot1)) {
 				vertex.setSecond(val);
 				System.out.println("update de "+ mot1 + " avec success : new val " + vertex.getSecond());
-			}
+			} 
 		}
 		
 	}

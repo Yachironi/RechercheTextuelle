@@ -58,30 +58,19 @@ public class SuffixArray {
 			}
 		};
 		System.out.println("1-3");
-		//Collections.sort(suffixArray, comparator);
+		Collections.sort(suffixArray, comparator);
 		//qsort ( suffixArray , 0 , suffixArray.size()-1 ) ;
 		System.out.println("1-4");
-		/*try {
+		try {
 			setLcp();
 			System.out.println("&-3");
 		} catch (TokenNotFoundException e) {
 			e.printStackTrace();
 		}
 		
-		/*
 		
-		System.out.println("TAILLLLLLLEEEE");
-		System.out.println(suffixArray.size());
-		System.out.println(lcpArray.size());
 		
-		System.out.println("------- DEB SuffixArray -------");
-		for (int i = 0; i < suffixArray.size(); i++)
-		{	System.out
-					.println(corpus.getSuffixFromPosition(suffixArray.get(i)));
-		System.out.println(lcpArray.get(i));
-		}
-		System.out.println("------- FIN SuffixArray -------");
-		*/
+		
 		
 		/*
 		 * for(int i=0;i<lcpArray.size();i++){
@@ -181,12 +170,17 @@ public class SuffixArray {
 			}
 			// valeur a ete trouvee
 			else {
+				System.out.println("MILIEU : "+milieu);
+				System.out.println(corpus.getTokenAtPosition(suffixArray.get(milieu)));
+				System.out.println(corpus.getSuffixFromPosition(suffixArray.get(milieu)));
 				while(lcpArray.get(milieu)>=phrase.split(" ").length) 
 					{
 					resultat.add(milieu);
 					milieu--;	
 					}
 				resultat.add(milieu);
+				System.out.println("dicho oki");
+
 				return resultat;	// milieu est la position ou se trouve valeur
 			}
 			milieu = debut + (fin-debut)/2;
@@ -227,7 +221,8 @@ public class SuffixArray {
 				int val  = corpus.getDebutPhrase(suffixArray.get(resultat.get(i)));
 				finale.add(corpus.getTab_line().get_i2((val)));
 			}
-			 return new ArrayList<>(finale);
+			System.out.println(finale); 
+			return new ArrayList<>(finale);
 			}	
 				
 		} catch (TokenNotFoundException e) {
